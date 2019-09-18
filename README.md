@@ -5,12 +5,13 @@ This repo will get you up and running for Graphics on Ubuntu 18.04 or 18.10
 Prerequisites
   A working version of Ubuntu 18.04 or 18.10 
   Guide to virtual box instllation https://www.wikihow.com/Install-Ubuntu-on-VirtualBox
+  git - sudo apt-get install git
 
-After Installation of Ubuntu open terminal and run these commands 
+After Installation of Ubuntu open terminal and run these commands to get proper libs 
   
-  sudo apt install g++  
-  sudo apt-get install freeglut3-dev
-  sudo apt-get install libglew-dev
+ sudo apt install g++  
+ sudo apt-get install freeglut3-dev
+ sudo apt-get install libglew-dev
   
-  You are now able to run the makefile as intended by Dr.Chelberg
+You are now able to run the makefile as intended by Dr.Chelberg
   
