@@ -1,0 +1,27 @@
+# This file contains definitions common to all makefiles in
+# subdirectories. Changing this one file therefore modifies all
+# makefiles below this one as they include these definitions.
+
+#
+# Written by David Chelberg (dmc)
+# Modified to add the ApplicationServices framework, needed for WarpCursor
+# last-modified: Sun Sep 24 14:11:23 2017
+
+CC=g++
+CC_OPTIONS=-Wall -pedantic -Wno-deprecated -std=c++11
+
+GL_OPTIONS=-framework OpenGL -framework GLUT -framework Foundation -framework ApplicationServices
+# You can add -L/opt/X11/lib if X11 installed
+LDLIBS=$(GL_OPTIONS)
+
+# replace the following with where you put the angle code, and any
+# global includes you may want.  You can omit the X11 include if you
+# aren't using X11
+INCS = -I/Users/chelberg/class/cs4250/code-egs/angel06/include -I/Users/chelberg/class/cs4250/code-egs/ -I/opt/X11/include
+
+# Combine the options above
+OPTIONS=$(CC_OPTIONS) $(INCS)
+
+# Replace with where you've placed the shader code you need to compile
+# to use Angel's code to read in shaders.
+InitShader=/Users/chelberg/class/cs4250/code-egs/angel06/Common/initShader.o

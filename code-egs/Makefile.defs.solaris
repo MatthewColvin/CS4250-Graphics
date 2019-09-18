@@ -1,0 +1,32 @@
+# This file contains definitions common to all makefiles in
+# subdirectories. Changing this one file therefore modifies all
+# makefiles below this one as they include these definitions.
+
+#
+# Written by David Chelberg (dmc)
+# last-modified: Mon Sep 17 11:34:09 2012
+
+
+# Use Solaris's compiler, not g++
+#CC = /usr/bin/CC
+
+# Compiler options
+#CC_OPTIONS = -pedantic
+
+GCC_OPTIONS= -pedantic -I ../../include -g
+LDLIBS = -L/usr/local/lib/ -L/usr/X11R6/lib -lX11 -lXi -lXmu  -lGLEW -lGL -lGLU  -lglut -lm 
+INCS = -I/usr/local/include/ -I/home/cs425/code-egs/  -I/home/cs425/code-egs/angel06/include/ -I/opt/csw/include/
+
+#INCS = -I/usr/local/include/ -I/home/cs425/code-egs/ -I../include/
+
+OPTIONS=$(GCC_OPTIONS) $(INCS)
+
+# combine options for basic compilation
+#OPTIONS = $(CC_OPTIONS)  $(INCS) 
+
+# must use the following when building a executable
+#LDLIBS = -L/opt/csw/lib -R/opt/csw/lib -lGLEW -lGL -lglut -lm -lGLU
+LDLIBS = -lGLEW -lGL -lfreeglut -lm
+
+# program to link in compiling all binaries that initialize shaders
+InitShader = /home/cs425/code-egs/angel06/Common/InitShader.o

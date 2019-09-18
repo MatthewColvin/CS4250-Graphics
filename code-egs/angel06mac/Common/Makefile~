@@ -1,0 +1,14 @@
+# Simple makefile to make it compile on macs.
+#
+# Written by David M. Chelberg
+# last-modified: Thu Oct  1 17:10:36 2015
+#
+GCC_OPTIONS=-Wall -pedantic -I ../include -I/Users/chelberg/class/cs425/code/ -I/opt/X11/include
+
+GL_OPTIONS=-framework OpenGL -framework GLUT -framework Foundation
+LDLIBS = -L/opt/X11/lib
+
+OPTIONS=$(GCC_OPTIONS) $(GL_OPTIONS) 
+
+InitShader.o: InitShader.cpp
+	g++   $(GCC_OPTIONS) -c -o InitShader.o InitShader.cpp 
