@@ -55,6 +55,12 @@ GLfloat angular_velocity=1.0/230.0;
 GLfloat minor_axis=100.0;
 GLfloat major_axis=150.0;
 
+
+
+
+
+
+
 // Simple display draws a square of size sq_size*2 around mouse
 // location.
 extern "C" void display()
@@ -232,10 +238,6 @@ void setupMenu()
   glutAddMenuEntry("clear screen", 1);
   glutAddMenuEntry("red background", 2);
   glutAddMenuEntry("black background", 3);
-  /*  glutAddMenuEntry("The Answer", 42);
-  glutAddMenuEntry("clear screen", 32);
-  glutAddMenuEntry("red background", 22);
-  glutAddMenuEntry("black background", 12);*/
 
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
