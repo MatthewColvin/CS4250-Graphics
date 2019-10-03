@@ -1,4 +1,4 @@
-#include "Angel.h"
+#include "Angel.h" //  includes glut and glew
 #include <iostream>
 
 void windowsetup();
@@ -18,9 +18,8 @@ int main(int argc, char** argv) {
     glutInit(&argc,argv);  // start Glut
     windowsetup();
     setupglutcallbacks();
-
-
-
+    
+    
 
     glutMainLoop();
 }
@@ -48,11 +47,53 @@ void reshape(int w,int h){
     windowHeight = h;
 }
 
+void init()
+{
+  // Offset of square
+  GLint offsetLoc;
+  // Size of square
+  GLint sizeLoc;
+  // Color of square 
+  GLint colorLoc;
+
+  // Create a vertex array object on the GPU
+  GLuint vao;
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+
+  // Create and initialize a buffer object for transferring data to
+  // the GPU.
+  GLuint buffer;
+  glGenBuffers(1, &buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, buffer);
+
+  // Load shaders and use the resulting shader program
+  GLuint program = InitShader("vshader.glsl", "fshader.glsl");
+
+  windowSizeLoc = glGetUniformLocation(program, "windowSize");
+  if (windowSizeLoc==-1) {
+    std::cerr << "Unable to find windowSize parameter" << std::endl;
+  }
+
+  GLuint loc = glGetAttribLocation(program, "vPosition");
+  glEnableVertexAttribArray(loc);
+  glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+  glUniform2f(offsetLoc, 0.0, 0.0);   
+
+  glBufferData(GL_ARRAY_BUFFER, (Square::NumPoints+Circle::NumPoints)*sizeof(vec2), points, GL_STATIC_DRAW);
+}
+
+
+
 void windowsetup(){
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE); // RGB and double buffering in glut
     glutInitWindowPosition(200,200);
     glutInitWindowSize(500,500);
     glutCreateWindow("Homework1");
+
+    glClearColor(0.0, 0.0, 0.0, 1.0); // set background color to black
+
 }
 
 GLuint loadBMP_custom(const char * imagepath){
