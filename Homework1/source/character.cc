@@ -5,12 +5,14 @@
 
 Character::Character(int width, int height){
 
+    drawCount = 4;
+
     Vertex topright(0.5, 0.5, 0); // vertex 1
     Vertex topleft(-0.5, 0.5, 0); // 2
     Vertex bottomright(0.5,-0.5,0); // 3
     Vertex bottomleft(-0.5,-0.5,0); // 4
 
-    Vertex BoundingBox[4] = {topright,topleft,bottomright,bottomright};
+    Vertex BoundingBox[drawCount] = {topright,topleft,bottomright,bottomright};
 
     // element array for 2 triangles that make a square.
     int draworder[6] = {1,3,4,   1,2,4} ;

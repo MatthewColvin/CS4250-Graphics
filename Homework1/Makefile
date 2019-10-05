@@ -14,6 +14,7 @@ include /home/mcolvin/Documents/CS4250-Grapics/code-egs/Makefile.defs
 # with no arguments. 
 # animate is the executable to be created.
 
+
 homework: Homework1.cc character.cc character.h texture.h vertex.h
 	$(CC) Homework1.cc character.cc vertex.h texture.h  $(InitShader) $(OPTIONS) $(LDLIBS) -o homework
 
