@@ -140,6 +140,11 @@ extern "C" void mouse(int btn, int state, int x, int y)
 
     // Setting first parameter to true means to use the selection
     // colors, not the object colors
+
+    MySquare->selectColor(1.0,0.0,0.0);
+    MySquare2->selectColor(0.0,1.0,0.0);
+
+
     MySquare->draw(true);
     MySquare2->draw(true);
     MyCircle->draw(true);
@@ -156,12 +161,12 @@ extern "C" void mouse(int btn, int state, int x, int y)
 	      << int(PixelColor[2]) << std::endl;
     processSelection(PixelColor, btn);
 
-    /*
-    glutSwapBuffers();
+    
+    /*glutSwapBuffers();
     cout << "Type any character to continue: ";
     char a;
-    cin >> a;
-    */
+    cin >> a;  */
+    
 
     glClearColor (0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);

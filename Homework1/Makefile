@@ -9,13 +9,13 @@
 
 # Assumes the following file exists in the proper place.
 #include /home/cs425/code-egs/Makefile.defs
-include ../code-egs/Makefile.defs
+include /home/mcolvin/Documents/CS4250-Grapics/code-egs/Makefile.defs
 # First target in the makefile will be used if you simply type make
 # with no arguments. 
 # animate is the executable to be created.
 
-homework: Homework1.cc 
-	$(CC) Homework1.cc  $(InitShader) $(OPTIONS) $(LDLIBS) -o homework
+homework: Homework1.cc character.cc character.h texture.h vertex.h
+	$(CC) Homework1.cc character.cc vertex.h texture.h  $(InitShader) $(OPTIONS) $(LDLIBS) -o homework
 
 animate: animate.cc square.o circle.o object.o
 	$(CC) animate.cc  $(InitShader) square.o circle.o object.o $(OPTIONS) $(LDLIBS) -o animate
