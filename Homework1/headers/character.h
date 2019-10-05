@@ -4,7 +4,8 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include "vertex.h"
+#include "../headers/texture.h"
+#include "../headers/vertex.h"
 
 #include <GL/freeglut.h>
 #include <GL/glew.h>
@@ -14,7 +15,7 @@ class Character{
     public:
         // The width and height passed in will be the size of the square generated
         // I hope to somehow add textures to this constructor 
-       Character(int width,int height); 
+       Character(int width,int height,vec4 selectcolor); 
        ~Character();
 
        void Draw();

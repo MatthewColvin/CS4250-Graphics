@@ -1,4 +1,4 @@
-#include "character.h"
+#include "../headers/character.h"
 
 void windowsetup();
 void setupglutcallbacks();
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 
 
 void setupcharacter(){
-    dog = new Character(50,50);
+    dog = new Character(50,50,vec4(0.0,0.0,1.0,1.0));
 }
 
 
