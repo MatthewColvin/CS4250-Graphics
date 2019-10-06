@@ -1,4 +1,4 @@
-#include "../headers/character.h"
+#include "character.h"
 
 
 Character::Character(int width, int height,vec4 selectcolor){

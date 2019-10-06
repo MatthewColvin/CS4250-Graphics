@@ -17,8 +17,8 @@ include /home/mcolvin/Documents/CS4250-Grapics/code-egs/Makefile.defs
 
 
 
-homework: ./source/Homework1.cc character.o  vertex.o
-	$(CC) ./source/Homework1.cc  $(InitShader) character.o  vertex.o $(OPTIONS) $(LDLIBS) -o homework
+homework: Homework1.cc character.o vertex.o
+	$(CC) Homework1.cc  $(InitShader) character.o  vertex.o $(OPTIONS) $(LDLIBS) -o homework
 
 animate: animate.cc square.o circle.o object.o
 	$(CC) animate.cc  $(InitShader) square.o circle.o object.o $(OPTIONS) $(LDLIBS) -o animate
@@ -28,12 +28,13 @@ animate: animate.cc square.o circle.o object.o
 # are passed, not the LDLIBS as there will be no linking done for the
 # .o files.
 
-vertex.o: ./headers/vertex.h ./source/vertex.cc 
-	$(CC) ./source/vertex.cc -c $(OPTIONS)
-#texture.o: ./headers/texture.h ./source/texture.cc 
-#	$(CC) ./source/texture.cc -c $(OPTIONS)
-character.o: ./headers/character.h ./source/character.cc 
-	$(CC) ./source/character.cc -c $(OPTIONS)
+vertex.o: vertex.h vertex.cc 
+	$(CC) vertex.cc -c $(OPTIONS)
+#texture.o: texture.h texture.cc 
+#	$(CC) texture.cc -c $(OPTIONS)
+
+character.o: character.h character.cc 
+	$(CC) character.cc -c $(OPTIONS)
 
 
 square.o: square.h square.cc object.h

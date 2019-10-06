@@ -1,14 +1,8 @@
 #ifndef TEXTURE_H
 #define VEXTURE_H
 
-
-#include <Angel.h>
-#include <GL/freeglut.h>
-#include <GL/glew.h>
 #include <string>
-#include <stdio.h>
-#include <iostream>
-
+#include <Angel.h>
 
 class Texture{
 

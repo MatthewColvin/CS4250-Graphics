@@ -1,5 +1,6 @@
-#include "../headers/character.h"
-#include "../headers/vertex.h"
+#include "character.h"
+#include "vertex.h"
+
 #include "Angel.h"
 
 void windowsetup();

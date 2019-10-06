@@ -4,7 +4,7 @@
 #include <Angel.h>
 #include <iostream>
 #include <stdlib.h>
-#include "../headers/vertex.h"
+#include "vertex.h"
 
 
 
