@@ -69,6 +69,7 @@ vector<Square*> trees;
 vec2 *points;
 // Used to keep track of where we are in generating selection colors
 vec3 selectioncolors = vec3(0.0,0.0,1.0);
+const int INITIAL_CHARACTER_SIZE = 20;
 // Window Size 
 GLint windowSizeLoc;
 // Window size
@@ -363,22 +364,22 @@ void setupcharacters(GLint offsetloc,GLint sizeloc,GLint colorloc){
   GLfloat randomx, randomy;
   //set up the good characters 
   for (int i=0; i<5; i++){
-    randomx = rand() % win_w;
-    randomy = rand() % win_h/2; //spawn good guys in the bottom half
+    randomx = rand() % (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE ;
+    randomy = rand() % win_h/3; //spawn good guys in the bottom half
     
     civilians.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
-    civilians[i]->change_size(20);
-    civilians[i]->move(randomx,randomy);
+    civilians[i]->change_size(INITIAL_CHARACTER_SIZE);
+    civilians[i]->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
     civilians[i]->selectColor(nextselectioncolor());
   }
   //set up the bad characters
   for (int i=0; i<5; i++){
-    randomx = rand() % win_w;
-    randomy = rand() % win_h/2 + win_h/2 ;// spawn bad characters in the top half
+    randomx = rand() %  (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE;
+    randomy = rand() % win_h/3 + win_h/2 ;// spawn bad characters in the top half
     
     invaders.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
-    invaders[i]->change_size(20);
-    invaders[i]->move(randomx,randomy);
+    invaders[i]->change_size(INITIAL_CHARACTER_SIZE);
+    invaders[i]->move(randomx,randomy-INITIAL_CHARACTER_SIZE);
     invaders[i]->color(BAD_GUY_COLOR);
     invaders[i]->selectColor(CANNOT_SELECT);
   }
