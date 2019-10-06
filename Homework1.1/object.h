@@ -68,6 +68,8 @@ class Object
   // Returns the selected state of this object
   bool GetSelected();
 
+  inline bool isSelected(){return selected;};
+
   inline GLfloat getSpeed(){return(speed);};
 
   inline void setSpeed(GLfloat movementspeed){ speed = movementspeed;};

@@ -37,8 +37,13 @@ public:
   void change_goal(GLint nx, GLint ny);
 
   // Change goal location for square
-  void change_goal(vec2 npos);
-  
+  void change_goal(vec2 npos);  
+
+  void move_up(int amount);
+  void move_down(int amount);
+  void move_right(int amount);
+  void move_left(int amount);
+
 private:
   static bool inited;
 

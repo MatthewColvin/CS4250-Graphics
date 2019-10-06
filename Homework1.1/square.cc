@@ -96,3 +96,19 @@ void Square::change_goal(vec2 npos){
   goal_x = npos.x;
   goal_y = npos.y;
 }
+
+void Square::move_up(int amount){
+  y+=amount;
+}
+
+void Square::move_down(int amount){
+  y-=amount;
+}
+
+void Square::move_left(int amount){
+  x-=amount;
+}
+
+void Square::move_right(int amount){
+  x+=amount;
+}

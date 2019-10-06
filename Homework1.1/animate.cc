@@ -31,7 +31,7 @@ using std::vector;
 
 // Game functions 
 void setupgame();
-void setupcharacters(int offsetloc,int sizeloc, int colorloc);
+void setupcharacters(GLint offsetloc,GLint sizeloc, GLint colorloc);
 
 
 void processSelection(unsigned char PixelColor[], int btn);
@@ -60,7 +60,7 @@ vector<Square*> characters;
 
 // Data storage for our geometry for the lines
 vec2 *points;
-// Used to keep track of used selection color
+// Used to keep track of where we are in generating selection colors
 vec3 selectioncolors = vec3(0.0,0.0,0.0);
 // Window Size 
 GLint windowSizeLoc;
@@ -200,25 +200,29 @@ extern "C" void key(unsigned char k, int xx, int yy){
     break;
   case 'c':
     clearscreen = !clearscreen;
-    break;
-  default:
-    break;
   }
 
 
   // control the selected hero
-  switch (k){
-    case 'w': //
-
-    case 'a':
-
-    case 's':
-
-    case 'd':
-    break;
+  
+  for (auto character: characters){
+    if(character->isSelected()){
+      switch (k){
+      case 'w':
+        character->move_up(10);
+        break;
+      case 'a':
+        character->move_left(10);
+        break;
+      case 's':
+        character->move_down(10);
+        break;
+      case 'd':
+        character->move_right(10);
+        break;
+      }
+    }
   }
-
-
   glutPostRedisplay();
 }
 
@@ -340,11 +344,11 @@ void setupcharacters(GLint offsetloc,GLint sizeloc,GLint colorloc){
     characters.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
     characters[i]->change_size(20);
     characters[i]->move(randomx,randomy);
-    characters[i]->selectColor(i/255.0, 0.0, 0.0);
+    characters[i]->selectColor(nextselectioncolor());
   }
 
 }
-
+// generates a selection color different from all others
 vec3 nextselectioncolor(){
   if (selectioncolors.x < 255.0){
     if (selectioncolors.y >= 255.0){
@@ -361,7 +365,7 @@ vec3 nextselectioncolor(){
       }
     }
   }
-  return selectioncolors;
+  return selectioncolors/255;
 }
 
 
