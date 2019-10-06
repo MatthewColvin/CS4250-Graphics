@@ -68,6 +68,10 @@ class Object
   // Returns the selected state of this object
   bool GetSelected();
 
+  inline GLfloat getSpeed(){return(speed);};
+
+  inline void setSpeed(GLfloat movementspeed){ speed = movementspeed;};
+
 protected:
   GLfloat size; // size of object (see individual objects for specific meaning)
 
@@ -79,6 +83,9 @@ protected:
   GLfloat r;
   GLfloat g;
   GLfloat b;
+  
+  //Speed of the object
+  GLfloat speed;
 
   // Color for selection drawing of object
   GLfloat sr;

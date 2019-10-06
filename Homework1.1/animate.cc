@@ -19,135 +19,97 @@
 #include <stdlib.h>
 #include "square.h"
 #include "circle.h"
+#include <vector>
+#include <random>
+#include <time.h>
 
 using std::cin;
 using std::cout;
 using std::endl;
+using std::vector;
 
-// Bool to determine whether to clear the screen
-bool clear=true;
 
+// Game functions 
+void setupgame();
+void setupcharacters(int offsetloc,int sizeloc, int colorloc);
+
+
+void processSelection(unsigned char PixelColor[], int btn);
+void setupMenu();
+void glutwindowinit();
+
+//Glut Callbackfuncitons 
+extern "C" void display();
+extern "C" void idle();
+extern "C" void mouse(int btn, int state, int x, int y);
+extern "C" void menustatus(int status, int x, int y);
+extern "C" void motion(int x, int y);
+extern "C" void myReshape(int w, int h);
+extern "C" void myMenu(int value);
+extern "C" void key(unsigned char k, int xx, int yy);
+extern "C" void special(int k, int xx, int yy);
+
+//Global Variables 
+bool clearscreen=true;
 // Bool to determine whether to update the animation
 bool updating=true;
+//vector to hold all the characters
+vector<Square*> characters;
 
-// Pointer to the square object (must be initialized after
-// initialization of shaders, so leave it as a pointer.
-Square *MySquare;
-Square *MySquare2;
-Circle *MyCircle;
 
 // Data storage for our geometry for the lines
 vec2 *points;
-
-// How big a square to draw.
-GLfloat size=30.0;
-
 // Window Size 
 GLint windowSizeLoc;
-
 // Window size
-int win_h=0;
-int win_w=0;
+int win_h=900;
+int win_w=900;
 
-// Initial parameters of the ellipses
-GLfloat angular_offset=3.14;
-GLfloat angular_velocity=1.0/230.0;
-GLfloat minor_axis=100.0;
-GLfloat major_axis=150.0;
 
-// Simple display draws a square of size sq_size*2 around mouse
-// location.
-extern "C" void display()
-{
-  // What happens if the following is commented out?  Explain.
-  if (clear) {
+extern "C" void display(){
+  if (clearscreen) {
     glClear(GL_COLOR_BUFFER_BIT);
   }
-
-  MySquare->draw();
-  MySquare2->draw();
-  MyCircle->draw();
+  //Draw all the characters
+  for (auto character : characters){
+    character->draw();
+  }
 
   glutSwapBuffers ();
 }
 
-// Using idle to update all objects.  MySquare2 can move linearly,
-// MySquare is orbiting MySquare2, so update_ellipse is
-// called for it after setting the goal (the center of the ellipse)
-// for it.  MyCircle orbits MySquare so its goal is set to the
-// location of MySquare.
-extern "C" void idle()
-{
+extern "C" void idle(){
   if (updating) {
-
-    MySquare2->update();
-
-    // Make MySquare and MyCircle follow MySquare2, but rotate around it
-    MySquare->change_goal(MySquare2->get_pos());
-    MySquare->update_ellipse();
-    MyCircle->change_goal(MySquare->get_pos());
-    MyCircle->update_ellipse();
 
     glutPostRedisplay();
   }
 }
 
-void processSelection(unsigned char PixelColor[], int btn)
-{
+void processSelection(unsigned char PixelColor[], int btn){
   // std::cout << PixelColor.x << " " << PixelColor.y << " " << PixelColor.z << std::endl;
-
-  // Decide what object is there (if any)
-  if (cmpcolor(PixelColor,MyCircle->getSelectColor())) {
-    //    std::cout << "You chose the Circle\n";
-    // If middle button click, then keep selecting, if left button,
-    // then unselect the other objects
-    if (btn==GLUT_LEFT_BUTTON) {
-      MySquare2->notSelected();
-      MySquare->notSelected();
+  
+  for (auto character : characters){
+    if (cmpcolor(PixelColor,character->getSelectColor())){
+      character->Selected();
+    }else{
+      character->notSelected();
     }
-    MyCircle->Selected();
-  } else if (cmpcolor(PixelColor,MySquare->getSelectColor())) {
-    //    std::cout << "You chose the moving Square\n";
-    // If middle button click, then keep selecting, if left button,
-    // then unselect the other objects
-    if (btn==GLUT_LEFT_BUTTON) {
-      MySquare2->notSelected();
-      MyCircle->notSelected();
-    }
-    MySquare->Selected();
-  } else if (cmpcolor(PixelColor,MySquare2->getSelectColor())) {
-    //    std::cout << "You chose the central Square\n";
-    // If middle button click, then keep selecting, if left button,
-    // then unselect the other objects
-    if (btn==GLUT_LEFT_BUTTON) {
-      MySquare->notSelected();
-      MyCircle->notSelected();
-    }
-    MySquare2->Selected();
-  } else {
-    //      std::cout << "You missed all objects\n";
-  }
+  } 
 }
 
 // Mouse callback, implements selection by using colors in the back buffer.
-extern "C" void mouse(int btn, int state, int x, int y)
-{
+extern "C" void mouse(int btn, int state, int x, int y){
   if (state == GLUT_DOWN) {
     // Draw the scene with identifying colors
     // Ensure the clear color isn't the same as any of your objects
     glClearColor (0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Setting first parameter to true means to use the selection
-    // colors, not the object colors
+    // draw the character in the selection color in the back buffer
+    for (auto character : characters){
+      character->draw(true);
+    }
 
-    MySquare->selectColor(1.0,0.0,0.0);
-    MySquare2->selectColor(0.0,1.0,0.0);
-
-
-    MySquare->draw(true);
-    MySquare2->draw(true);
-    MyCircle->draw(true);
     // Flush ensures all commands have drawn
     glFlush();
 
@@ -161,12 +123,6 @@ extern "C" void mouse(int btn, int state, int x, int y)
 	      << int(PixelColor[2]) << std::endl;
     processSelection(PixelColor, btn);
 
-    
-    /*glutSwapBuffers();
-    cout << "Type any character to continue: ";
-    char a;
-    cin >> a;  */
-    
 
     glClearColor (0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -175,27 +131,22 @@ extern "C" void mouse(int btn, int state, int x, int y)
 }
 
 // Allows you to still get location of mouse clicks when using menus
-extern "C" void menustatus(int status, int x, int y)
-{
+extern "C" void menustatus(int status, int x, int y){
   // Pass the new location to the object.
-  MySquare2->change_goal(x, win_h-y);
+
   glutPostRedisplay();
 }  
 
 // Called whenever mouse moves, after being pressed
-extern "C" void motion(int x, int y)
-{
-  // Pass the new location to the object.
-  //  MySquare->move(x, win_h-y);
-  MySquare2->change_goal(x, win_h-y);
+extern "C" void motion(int x, int y){
 
+ 
   glutPostRedisplay();
 }
 
 
 // Maintains the mapping from screen to world coordinates.
-extern "C" void myReshape(int w, int h)
-{
+extern "C" void myReshape(int w, int h){
   glViewport(0,0,w,h);
   win_h = h;
   win_w = w;
@@ -205,8 +156,7 @@ extern "C" void myReshape(int w, int h)
 }
 
 // Example menu code.
-extern "C" void myMenu(int value)
-{
+extern "C" void myMenu(int value){
   switch (value) {
   case 1:
     // Clear screen
@@ -228,19 +178,11 @@ extern "C" void myMenu(int value)
 
 
 // Create menu and items.
-// %%%
-// %%% What happens if we change the menu's numbering scheme?
-// %%%
-void setupMenu()
-{
+void setupMenu(){
   glutCreateMenu(myMenu);
   glutAddMenuEntry("clear screen", 1);
   glutAddMenuEntry("red background", 2);
   glutAddMenuEntry("black background", 3);
-  /*  glutAddMenuEntry("The Answer", 42);
-  glutAddMenuEntry("clear screen", 32);
-  glutAddMenuEntry("red background", 22);
-  glutAddMenuEntry("black background", 12);*/
 
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
@@ -253,62 +195,16 @@ extern "C" void key(unsigned char k, int xx, int yy)
   case 'Q': 
     exit(0);
     break;
-  // make the size of the square larger
   case '+':
-    size+=2;
-    MySquare->change_size(size);
     break;
-  // make the size of the square smaller
   case '-':
-    size-=2;
-    // Test for non-sensical size.
-    if (size < 0) {
-      size=0;
-    }
-    MySquare->change_size(size);
     break;
   case 'c':
-    clear = !clear;
+    clearscreen = !clearscreen;
     break;
   case '>':
-    if (MyCircle->GetSelected()) {
-      MyCircle->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      angular_offset+=0.1;
-      MyCircle->set_ellipse_parameters(minor_axis, major_axis, angular_offset, angular_velocity);
-    }
-    if (MySquare->GetSelected()) {
-      MySquare->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      angular_offset+=0.1;
-      MySquare->set_ellipse_parameters(minor_axis, major_axis, angular_offset, angular_velocity);
-    }
-    break;
-  case '<':
-    if (MyCircle->GetSelected()) {
-      MyCircle->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      angular_offset-=0.1;
-      MyCircle->set_ellipse_parameters(minor_axis, major_axis, angular_offset, angular_velocity);
-    }
-    if (MySquare->GetSelected()) {
-      MySquare->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      angular_offset-=0.1;
-      MySquare->set_ellipse_parameters(minor_axis, major_axis, angular_offset, angular_velocity);
-    }
-    break;
-  case ' ':
-    updating = !updating;
-    if (updating) {
-      MySquare->set_last_time();
-      MySquare2->set_last_time();
-      MyCircle->set_last_time();
-    }
-      
     break;
   default:
-    // Anything else.
     break;
   }
   // Something might have changed requiring redisplay
@@ -317,72 +213,15 @@ extern "C" void key(unsigned char k, int xx, int yy)
 
 // Special Keys events.
 // This one only responds to the up arrow key.
-extern "C" void special(int k, int xx, int yy)
-{
+extern "C" void special(int k, int xx, int yy){
   switch (k) {
   case GLUT_KEY_UP:
-    if (MyCircle->GetSelected()) {
-      MyCircle->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      angular_velocity*=1.5;
-      MyCircle->set_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-    }
-    if (MySquare->GetSelected()) {
-      MySquare->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      angular_velocity*=1.5;
-      MySquare->set_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-    }
     break;
   case GLUT_KEY_DOWN:
-    if (MyCircle->GetSelected()) {
-      MyCircle->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      angular_velocity/=1.5;
-      MyCircle->set_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-    }
-    if (MySquare->GetSelected()) {
-      MySquare->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      angular_velocity/=1.5;
-      MySquare->set_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-    }
     break;
   case GLUT_KEY_LEFT:
-    if (MyCircle->GetSelected()) {
-      MyCircle->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      minor_axis*=1.5;
-      MyCircle->set_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-    }
-    if (MySquare->GetSelected()) {
-      MySquare->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      minor_axis*=1.5;
-      MySquare->set_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-    }
     break;
   case GLUT_KEY_RIGHT:
-    if (MyCircle->GetSelected()) {
-      MyCircle->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      minor_axis/=1.5;
-      MyCircle->set_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-    }
-    if (MySquare->GetSelected()) {
-      MySquare->get_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-      minor_axis/=1.5;
-      MySquare->set_ellipse_parameters(minor_axis, major_axis,
-				       angular_offset, angular_velocity);
-    }
     break;
   default:
     // do nothing
@@ -392,13 +231,12 @@ extern "C" void special(int k, int xx, int yy)
 }
 
 // Initialize all OpenGL callbacks, create window.
-void myinit()
-{
+void glutwindowinit(){
   glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
-  glutInitWindowSize(900,900);
+  glutInitWindowSize(win_w,win_h);
   glutInitWindowPosition(20,20);
 
-  glutCreateWindow("Animation test");
+  glutCreateWindow("Homework 1");
 
   // Color initializations
   glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -423,8 +261,7 @@ void myinit()
 }
 
 // This function initializes the buffers and shaders
-void init()
-{
+void setupgame(){
   // Locations of variables in shaders.
   // Offset of square
   GLint offsetLoc;
@@ -433,7 +270,7 @@ void init()
   // Color of square 
   GLint colorLoc;
 
-  // Create a vertex array object on the GPU
+  // Create a vertex array object - this will hold the buffers necessary for the VAO
   GLuint vao;
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
@@ -446,10 +283,6 @@ void init()
 
   // Load shaders and use the resulting shader program
   GLuint program = InitShader("vshader.glsl", "fshader.glsl");
-
-  // InitShader does the glUseProgram
-  // So the following would be redundant
-  // glUseProgram(program);
 
   // Initialize the vertex position attribute from the vertex shader
   windowSizeLoc = glGetUniformLocation(program, "windowSize");
@@ -480,49 +313,39 @@ void init()
   points = new vec2[Square::NumPoints+Circle::NumPoints];
   //  glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 
-  // Build the square object
-  MySquare = new Square(0, points, offsetLoc, sizeLoc, colorLoc);
-  MySquare->change_size(size);
-  MySquare->move(450, 450);
-  MySquare->selectColor(1.0/255.0, 0.0, 0.0);
-
-  // Build another square object, note it shares the same points as
-  // the first one.
-  MySquare2 = new Square(0, points, offsetLoc, sizeLoc, colorLoc);
-  MySquare2->change_size(size);
-  MySquare2->move(450, 450);
-  MySquare2->change_goal(450, 450);
-  MySquare2->selectColor(2.0/255.0, 0.0, 0.0);
-
-  // The index to add the circle's points to the points array is at
-  // the end of the points from the square (Square::NumPoints).
-  MyCircle = new Circle(Square::NumPoints, points, offsetLoc, sizeLoc, colorLoc);
-  MyCircle->change_size(10);
-  MyCircle->move(450, 450);
-  MyCircle->selectColor(3.0/255.0, 0.0, 0.0);
-  MyCircle->set_ellipse_parameters(minor_axis, major_axis, angular_offset, angular_velocity);
-
+  setupcharacters(offsetLoc,sizeLoc,colorLoc);
   // Send the data to the graphics card, after it has been generated
   // by creating the objects in the world (above).
   glBufferData(GL_ARRAY_BUFFER, (Square::NumPoints+Circle::NumPoints)*sizeof(vec2), points, GL_STATIC_DRAW);
 }
 
-//  Main Program
-int main(int argc, char** argv)
-{
+void setupcharacters(GLint offsetloc,GLint sizeloc,GLint colorloc){
+  srand(time(NULL));// seed the random function with time
+  GLfloat randomx, randomy;
+  for (int i = 0; i<10; i++){
+    randomx = rand() % win_w;
+    randomy = rand() % win_h;
+    
+    characters.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
+    characters[i]->change_size(20);
+    characters[i]->move(randomx,randomy);
+    characters[i]->selectColor(i/255.0, 0.0, 0.0);
+  }
+
+}
+
+int main(int argc, char** argv){
   // Several people forgot to put in the following line.  This is an
   // error, even if it still works on your machine, a program is
   // incorrect without the following call to initialize GLUT.
   glutInit(&argc,argv);
 
-  myinit();             // set window attributes, and initial data
-
+  glutwindowinit();
   // Initialize the "magic" that glues all the code together.
   glewInit();
 
-  init();               // set up shaders and display environment
+  setupgame();   // set up shaders and display environment
 
   glutMainLoop();       // enter event loop
-
   return(EXIT_SUCCESS); // return successful exit code
 }

@@ -8,7 +8,7 @@
 # last-modified: last-modified: Fri Oct 25 15:20:14 2013
 
 # Assumes the following file exists in the proper place.
-include ../Makefile.defs
+include ../code-egs/Makefile.defs
 
 # First target in the makefile will be used if you simply type make
 # with no arguments. 
