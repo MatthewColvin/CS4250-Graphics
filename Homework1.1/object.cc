@@ -56,9 +56,12 @@ vec2 Object::get_pos()
 }
 
 // Change the size of the object.
-void Object::change_size(GLfloat nsize)
-{
+void Object::change_size(GLfloat nsize){
   size = nsize;
+}
+
+GLfloat Object::get_size(){
+  return size;
 }
 
 // Update the last time object was modified to now.

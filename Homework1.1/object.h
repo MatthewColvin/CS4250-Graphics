@@ -71,8 +71,10 @@ class Object
   inline bool isSelected(){return selected;};
 
   inline GLfloat getSpeed(){return(speed);};
-
   inline void setSpeed(GLfloat movementspeed){ speed = movementspeed;};
+
+  GLfloat get_size();
+
 
 protected:
   GLfloat size; // size of object (see individual objects for specific meaning)

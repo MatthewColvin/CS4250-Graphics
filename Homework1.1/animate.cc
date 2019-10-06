@@ -32,12 +32,18 @@ using std::vector;
 // Game functions 
 void setupgame();
 void setupcharacters(GLint offsetloc,GLint sizeloc, GLint colorloc);
-
-
 void processSelection(unsigned char PixelColor[], int btn);
 void setupMenu();
 void glutwindowinit();
 vec3 nextselectioncolor();
+
+//character movement functions
+bool can_move_up(Square character);
+bool can_move_down(Square character);
+bool can_move_left(Square character);
+bool can_move_right(Square character);
+
+
 
 //Glut Callbackfuncitons 
 extern "C" void display();
@@ -57,12 +63,12 @@ bool updating=true;
 //vector to hold all the characters
 vector<Square*> civilians;
 vector<Square*> invaders;
-
+vector<Square*> trees;
 
 // Data storage for our geometry for the lines
 vec2 *points;
 // Used to keep track of where we are in generating selection colors
-vec3 selectioncolors = vec3(0.0,0.0,0.0);
+vec3 selectioncolors = vec3(0.0,0.0,1.0);
 // Window Size 
 GLint windowSizeLoc;
 // Window size
@@ -75,8 +81,12 @@ extern "C" void display(){
   if (clearscreen) {
     glClear(GL_COLOR_BUFFER_BIT);
   }
+  
   //Draw all the characters
   for (auto character : civilians){
+    character->draw();
+  }
+  for(auto character : invaders){
     character->draw();
   }
 
@@ -210,16 +220,24 @@ extern "C" void key(unsigned char k, int xx, int yy){
     if(character->isSelected()){
       switch (k){
       case 'w':
-        character->move_up(10);
+        if(can_move_up(*character)){
+          character->move_up(10);
+        }
         break;
       case 'a':
-        character->move_left(10);
+        if(can_move_left(*character)){
+          character->move_left(10);
+        }
         break;
       case 's':
-        character->move_down(10);
+        if(can_move_down(*character)){
+          character->move_down(10);
+        }
         break;
       case 'd':
-        character->move_right(10);
+        if(can_move_right(*character)){
+          character->move_right(10);
+        }
         break;
       }
     }
@@ -336,17 +354,36 @@ void setupgame(){
 }
 
 void setupcharacters(GLint offsetloc,GLint sizeloc,GLint colorloc){
+  
+  const vec3 BAD_GUY_COLOR= vec3 (1.0,0.0,0.0);
+  const vec3 CANNOT_SELECT = vec3 (0.0,0.0,0.0);
+  
   srand(time(NULL));// seed the random function with time
+  
   GLfloat randomx, randomy;
-  for (int i = 0; i<5; i++){
+  //set up the good characters 
+  for (int i=0; i<5; i++){
     randomx = rand() % win_w;
-    randomy = rand() % win_h;
+    randomy = rand() % win_h/2; //spawn good guys in the bottom half
     
     civilians.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
     civilians[i]->change_size(20);
     civilians[i]->move(randomx,randomy);
     civilians[i]->selectColor(nextselectioncolor());
   }
+  //set up the bad characters
+  for (int i=0; i<5; i++){
+    randomx = rand() % win_w;
+    randomy = rand() % win_h/2 + win_h/2 ;// spawn bad characters in the top half
+    
+    invaders.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
+    invaders[i]->change_size(20);
+    invaders[i]->move(randomx,randomy);
+    invaders[i]->color(BAD_GUY_COLOR);
+    invaders[i]->selectColor(CANNOT_SELECT);
+  }
+
+
 
 }
 // generates a selection color different from all others
@@ -368,6 +405,35 @@ vec3 nextselectioncolor(){
   }
   return selectioncolors/255;
 }
+
+bool can_move_up(Square character){
+  if (character.get_pos().y >= win_h - character.get_size() ){ // character is at edge of window
+    return false;
+  }
+  return true; 
+}
+bool can_move_down(Square character){
+  if (character.get_pos().y <= 0 + character.get_size() ){// character is at edge of window
+    return false;
+  }
+  return true;
+}
+bool can_move_left(Square character){
+  if( character.get_pos().x <= 0 + character.get_size() ){// character is at edge of window
+    return false;
+  }
+
+  return true;
+}
+bool can_move_right(Square character){
+  if(character.get_pos().x >= win_w - character.get_size() ){// character is at edge of window
+    return false;
+  }
+
+  return true;
+}
+
+
 
 
 int main(int argc, char** argv){
