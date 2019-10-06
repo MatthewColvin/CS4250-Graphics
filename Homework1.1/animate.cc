@@ -55,7 +55,8 @@ bool clearscreen=true;
 // Bool to determine whether to update the animation
 bool updating=true;
 //vector to hold all the characters
-vector<Square*> characters;
+vector<Square*> civilians;
+vector<Square*> invaders;
 
 
 // Data storage for our geometry for the lines
@@ -75,7 +76,7 @@ extern "C" void display(){
     glClear(GL_COLOR_BUFFER_BIT);
   }
   //Draw all the characters
-  for (auto character : characters){
+  for (auto character : civilians){
     character->draw();
   }
 
@@ -92,7 +93,7 @@ extern "C" void idle(){
 void processSelection(unsigned char PixelColor[], int btn){
   // std::cout << PixelColor.x << " " << PixelColor.y << " " << PixelColor.z << std::endl;
   
-  for (auto character : characters){
+  for (auto character : civilians){
     if (cmpcolor(PixelColor,character->getSelectColor())){
       character->Selected();
     }else{
@@ -110,7 +111,7 @@ extern "C" void mouse(int btn, int state, int x, int y){
     glClear(GL_COLOR_BUFFER_BIT);
 
     // draw the character in the selection color in the back buffer
-    for (auto character : characters){
+    for (auto character : civilians){
       character->draw(true);
     }
 
@@ -205,7 +206,7 @@ extern "C" void key(unsigned char k, int xx, int yy){
 
   // control the selected hero
   
-  for (auto character: characters){
+  for (auto character: civilians){
     if(character->isSelected()){
       switch (k){
       case 'w':
@@ -337,14 +338,14 @@ void setupgame(){
 void setupcharacters(GLint offsetloc,GLint sizeloc,GLint colorloc){
   srand(time(NULL));// seed the random function with time
   GLfloat randomx, randomy;
-  for (int i = 0; i<10; i++){
+  for (int i = 0; i<5; i++){
     randomx = rand() % win_w;
     randomy = rand() % win_h;
     
-    characters.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
-    characters[i]->change_size(20);
-    characters[i]->move(randomx,randomy);
-    characters[i]->selectColor(nextselectioncolor());
+    civilians.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
+    civilians[i]->change_size(20);
+    civilians[i]->move(randomx,randomy);
+    civilians[i]->selectColor(nextselectioncolor());
   }
 
 }
