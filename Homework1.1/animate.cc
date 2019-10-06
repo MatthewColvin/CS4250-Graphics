@@ -37,6 +37,7 @@ void setupcharacters(int offsetloc,int sizeloc, int colorloc);
 void processSelection(unsigned char PixelColor[], int btn);
 void setupMenu();
 void glutwindowinit();
+vec3 nextselectioncolor();
 
 //Glut Callbackfuncitons 
 extern "C" void display();
@@ -59,11 +60,14 @@ vector<Square*> characters;
 
 // Data storage for our geometry for the lines
 vec2 *points;
+// Used to keep track of used selection color
+vec3 selectioncolors = vec3(0.0,0.0,0.0);
 // Window Size 
 GLint windowSizeLoc;
 // Window size
 int win_h=900;
 int win_w=900;
+
 
 
 extern "C" void display(){
@@ -188,26 +192,33 @@ void setupMenu(){
 }
 
 // Keypress events.
-extern "C" void key(unsigned char k, int xx, int yy)
-{
+extern "C" void key(unsigned char k, int xx, int yy){
   switch (k) {
   case 'q':
   case 'Q': 
     exit(0);
     break;
-  case '+':
-    break;
-  case '-':
-    break;
   case 'c':
     clearscreen = !clearscreen;
-    break;
-  case '>':
     break;
   default:
     break;
   }
-  // Something might have changed requiring redisplay
+
+
+  // control the selected hero
+  switch (k){
+    case 'w': //
+
+    case 'a':
+
+    case 's':
+
+    case 'd':
+    break;
+  }
+
+
   glutPostRedisplay();
 }
 
@@ -333,6 +344,26 @@ void setupcharacters(GLint offsetloc,GLint sizeloc,GLint colorloc){
   }
 
 }
+
+vec3 nextselectioncolor(){
+  if (selectioncolors.x < 255.0){
+    if (selectioncolors.y >= 255.0){
+      selectioncolors.x++;
+      selectioncolors.y = 0;
+    }
+    if(selectioncolors.y < 255.0){
+      if (selectioncolors.z >= 255.0){
+        selectioncolors.y++;
+        selectioncolors.z = 0;
+      }
+      if(selectioncolors.z < 255.0){
+        selectioncolors.z++;
+      }
+    }
+  }
+  return selectioncolors;
+}
+
 
 int main(int argc, char** argv){
   // Several people forgot to put in the following line.  This is an
