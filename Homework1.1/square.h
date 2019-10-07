@@ -6,7 +6,9 @@
 // 
 // Assumes that the square object was defined in the VAO at location
 // index
-
+//
+// must call goal_to_pos in order to use any move_... functions
+//
 // last-modified: Fri Oct 25 15:22:05 2013
 
 #include <Angel.h>
@@ -38,6 +40,9 @@ public:
 
   // Change goal location for square
   void change_goal(vec2 npos);  
+
+  // must call goal_to_pos in order to use any move_... functions
+  void goal_to_pos();
 
   void move_up(int amount);
   void move_down(int amount);

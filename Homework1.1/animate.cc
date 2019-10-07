@@ -30,52 +30,63 @@ using std::vector;
 
 
 // Game functions 
-void setupgame();
-void setupcharacters(GLint offsetloc,GLint sizeloc, GLint colorloc);
-void processSelection(unsigned char PixelColor[], int btn);
-void setupMenu();
-void glutwindowinit();
-vec3 nextselectioncolor();
+  void buffersetup();
+  void mapsetup(GLint offsetloc,GLint sizeloc, GLint colorloc);
+  void processSelection(unsigned char PixelColor[], int btn);
+  vec3 nextselectioncolor();
+//
 
-//character movement functions
-bool can_move_up(Square character);
-bool can_move_down(Square character);
-bool can_move_left(Square character);
-bool can_move_right(Square character);
+//Character Movement Functions
+  bool can_move_up(Square character,int amount);
+  bool can_move_down(Square character,int amount);
+  bool can_move_left(Square character,int amount);
+  bool can_move_right(Square character,int amount);
+  void moveinvaders(int amount);
+  bool ischaractertouchingtree(Square character,Square tree);
+//
 
-
-
-//Glut Callbackfuncitons 
-extern "C" void display();
-extern "C" void idle();
-extern "C" void mouse(int btn, int state, int x, int y);
-extern "C" void menustatus(int status, int x, int y);
-extern "C" void motion(int x, int y);
-extern "C" void myReshape(int w, int h);
-extern "C" void myMenu(int value);
-extern "C" void key(unsigned char k, int xx, int yy);
-extern "C" void special(int k, int xx, int yy);
+//Glut setup and Callbackfuncitons 
+  void glutwindowinit();
+  extern "C" void display();
+  extern "C" void idle();
+  extern "C" void mouse(int btn, int state, int x, int y);
+  extern "C" void menustatus(int status, int x, int y);
+  extern "C" void motion(int x, int y);
+  extern "C" void myReshape(int w, int h);
+  extern "C" void myMenu(int value);
+    void setupMenu();
+  extern "C" void key(unsigned char k, int xx, int yy);
+  extern "C" void special(int k, int xx, int yy);
+//
 
 //Global Variables 
-bool clearscreen=true;
-// Bool to determine whether to update the animation
-bool updating=true;
-//vector to hold all the characters
-vector<Square*> civilians;
-vector<Square*> invaders;
-vector<Square*> trees;
+  bool clearscreen=true;
+  bool invadersmoving=true;
+  //vector to hold all the characters
+    vector<Square*> civilians;
+    vector<Square*> invaders;
+    vector<Square*> trees;
+  // Data storage for our geometry for the lines
+    vec2 *points;
+  // Used to keep track of where we are in generating selection colors
+    vec3 selectioncolors = vec3(0.0,0.0,1.0);
+  // Window Size 
+    GLint windowSizeLoc;
+    int win_h=900;
+    int win_w=900;
+  // Custom Game Variables Setup
+    const int INITIAL_TREE_SIZE = 40; 
+    const int INITIAL_CHARACTER_SIZE = 20;
+    const int NUM_BAD_GUYS = 5;
+    const int NUM_GOOD_GUYS = 5;
+    const int NUM_TREES = 2;
+    const int CIVILIANS_STEP_SIZE = 1;
+    const int INVADERS_STEP_SIZE = 1;
+    const GLfloat CIVILIANS_SPEED = 0.09;
+    const GLfloat INVADERS_SPEED = 0.09;
 
-// Data storage for our geometry for the lines
-vec2 *points;
-// Used to keep track of where we are in generating selection colors
-vec3 selectioncolors = vec3(0.0,0.0,1.0);
-const int INITIAL_CHARACTER_SIZE = 20;
-// Window Size 
-GLint windowSizeLoc;
-// Window size
-int win_h=900;
-int win_w=900;
-
+  //
+//
 
 
 extern "C" void display(){
@@ -90,27 +101,44 @@ extern "C" void display(){
   for(auto character : invaders){
     character->draw();
   }
+  for(auto tree : trees){
+    tree->draw();
+  }
 
   glutSwapBuffers ();
 }
 
 extern "C" void idle(){
-  if (updating) {
-
-    glutPostRedisplay();
+  if (invadersmoving) {
+   moveinvaders(INVADERS_STEP_SIZE); 
   }
+
+  glutPostRedisplay();
 }
 
 void processSelection(unsigned char PixelColor[], int btn){
   // std::cout << PixelColor.x << " " << PixelColor.y << " " << PixelColor.z << std::endl;
-  
+  setupMenu();// menu possibilities update.
   for (auto character : civilians){
     if (cmpcolor(PixelColor,character->getSelectColor())){
       character->Selected();
+      cout << "Civilian at:" << character->get_pos().x << " " << character->get_pos().y << endl;
     }else{
       character->notSelected();
     }
   } 
+ for (auto character : invaders){
+    if (cmpcolor(PixelColor,character->getSelectColor())){
+      cout << "Invader at:" << character->get_pos().x << " " << character->get_pos().y << endl;
+    }
+  }
+  for (auto object : trees){
+    if (cmpcolor(PixelColor,object->getSelectColor())){
+    cout << "Tree at:" << object->get_pos().x << " " << object->get_pos().y << endl;
+    }
+  }
+
+
 }
 
 // Mouse callback, implements selection by using colors in the back buffer.
@@ -125,6 +153,16 @@ extern "C" void mouse(int btn, int state, int x, int y){
     for (auto character : civilians){
       character->draw(true);
     }
+    
+    
+    for (auto character : invaders){
+      character->draw(true);
+    }
+    for (auto object : trees){
+      object->draw(true);
+    }
+
+    
 
     // Flush ensures all commands have drawn
     glFlush();
@@ -175,12 +213,7 @@ extern "C" void myReshape(int w, int h){
 extern "C" void myMenu(int value){
   switch (value) {
   case 1:
-    // Clear screen
-    glClear (GL_COLOR_BUFFER_BIT);
-    break;
-  case 2:
-    // Set clear color to red
-    glClearColor (1.0, 0.0, 0.0, 1.0);
+    invadersmoving = !invadersmoving; // switch 
     break;
   case 3:
     // Set clear color to black
@@ -196,8 +229,11 @@ extern "C" void myMenu(int value){
 // Create menu and items.
 void setupMenu(){
   glutCreateMenu(myMenu);
-  glutAddMenuEntry("clear screen", 1);
-  glutAddMenuEntry("red background", 2);
+  if(invadersmoving){
+    glutAddMenuEntry("Stop Enemies", 1);
+  }else{
+    glutAddMenuEntry("Start Enemies",1);
+  }
   glutAddMenuEntry("black background", 3);
 
   glutAttachMenu(GLUT_RIGHT_BUTTON);
@@ -215,33 +251,37 @@ extern "C" void key(unsigned char k, int xx, int yy){
   }
 
 
-  // control the selected hero
-  
+  // control the selected civilian
   for (auto character: civilians){
     if(character->isSelected()){
+      // setting goal to current position so moving is interpereted correctly
+      character->goal_to_pos(); 
       switch (k){
       case 'w':
-        if(can_move_up(*character)){
-          character->move_up(10);
+        if(can_move_up(*character,CIVILIANS_STEP_SIZE)){
+          character->move_up(CIVILIANS_STEP_SIZE);
         }
         break;
       case 'a':
-        if(can_move_left(*character)){
-          character->move_left(10);
+        if(can_move_left(*character,CIVILIANS_STEP_SIZE)){
+          character->move_left(CIVILIANS_STEP_SIZE);
         }
         break;
       case 's':
-        if(can_move_down(*character)){
-          character->move_down(10);
+        if(can_move_down(*character,CIVILIANS_STEP_SIZE)){
+          character->move_down(CIVILIANS_STEP_SIZE);
         }
         break;
       case 'd':
-        if(can_move_right(*character)){
-          character->move_right(10);
+        if(can_move_right(*character,CIVILIANS_STEP_SIZE)){
+          character->move_right(CIVILIANS_STEP_SIZE);
         }
         break;
       }
+      character->update();
+      cout << "character at " << character->get_pos().x << " " << character->get_pos().y << endl;
     }
+    
   }
   glutPostRedisplay();
 }
@@ -296,7 +336,7 @@ void glutwindowinit(){
 }
 
 // This function initializes the buffers and shaders
-void setupgame(){
+void buffersetup(){
   // Locations of variables in shaders.
   // Offset of square
   GLint offsetLoc;
@@ -348,32 +388,34 @@ void setupgame(){
   points = new vec2[Square::NumPoints+Circle::NumPoints];
   //  glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 
-  setupcharacters(offsetLoc,sizeLoc,colorLoc);
+  mapsetup(offsetLoc,sizeLoc,colorLoc);
   // Send the data to the graphics card, after it has been generated
   // by creating the objects in the world (above).
   glBufferData(GL_ARRAY_BUFFER, (Square::NumPoints+Circle::NumPoints)*sizeof(vec2), points, GL_STATIC_DRAW);
 }
 
-void setupcharacters(GLint offsetloc,GLint sizeloc,GLint colorloc){
+void mapsetup(GLint offsetloc,GLint sizeloc,GLint colorloc){
   
   const vec3 BAD_GUY_COLOR= vec3 (1.0,0.0,0.0);
   const vec3 CANNOT_SELECT = vec3 (0.0,0.0,0.0);
+  const vec3 TREE_COLOR = vec3(0.0,1.0,0.0);
   
   srand(time(NULL));// seed the random function with time
   
   GLfloat randomx, randomy;
   //set up the good characters 
-  for (int i=0; i<5; i++){
+  for (int i=0; i<NUM_GOOD_GUYS; i++){
     randomx = rand() % (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE ;
     randomy = rand() % win_h/3; //spawn good guys in the bottom half
     
     civilians.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
     civilians[i]->change_size(INITIAL_CHARACTER_SIZE);
     civilians[i]->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
+    civilians[i]->setSpeed(CIVILIANS_SPEED);
     civilians[i]->selectColor(nextselectioncolor());
   }
   //set up the bad characters
-  for (int i=0; i<5; i++){
+  for (int i=0; i<NUM_BAD_GUYS; i++){
     randomx = rand() %  (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE;
     randomy = rand() % win_h/3 + win_h/2 ;// spawn bad characters in the top half
     
@@ -381,9 +423,20 @@ void setupcharacters(GLint offsetloc,GLint sizeloc,GLint colorloc){
     invaders[i]->change_size(INITIAL_CHARACTER_SIZE);
     invaders[i]->move(randomx,randomy-INITIAL_CHARACTER_SIZE);
     invaders[i]->color(BAD_GUY_COLOR);
-    invaders[i]->selectColor(CANNOT_SELECT);
+    invaders[i]->setSpeed(INVADERS_SPEED);
+    invaders[i]->selectColor(nextselectioncolor());
   }
-
+  // set up trees
+  for (int i=0; i<NUM_TREES; i++){
+    randomx = rand() %  (win_w - INITIAL_TREE_SIZE) + INITIAL_TREE_SIZE;
+    randomy = rand() %  (win_h - INITIAL_TREE_SIZE) + INITIAL_TREE_SIZE;
+    
+    trees.push_back(new Square(0,points,offsetloc,sizeloc,colorloc));
+    trees[i]->change_size(INITIAL_CHARACTER_SIZE);
+    trees[i]->move(randomx,randomy-INITIAL_CHARACTER_SIZE);
+    trees[i]->color(TREE_COLOR);
+    trees[i]->selectColor(nextselectioncolor());
+  }
 
 
 }
@@ -407,34 +460,100 @@ vec3 nextselectioncolor(){
   return selectioncolors/255;
 }
 
-bool can_move_up(Square character){
-  if (character.get_pos().y >= win_h - character.get_size() ){ // character is at edge of window
+//function to determine characters ability to move upward a given amount
+bool can_move_up(Square character,int amount){
+  if (character.get_pos().y >= win_h - character.get_size() - amount ){ // character is at edge of window
     return false;
+  }
+  for (auto tree : trees){
+    //if(ischaractertouchingtree(character,*tree)){return false;}
   }
   return true; 
 }
-bool can_move_down(Square character){
-  if (character.get_pos().y <= 0 + character.get_size() ){// character is at edge of window
+//function to determine characters ability to move downward a given amount
+bool can_move_down(Square character,int amount){
+  if (character.get_pos().y <= 0 + character.get_size() + amount ){// character is at edge of window
     return false;
   }
   return true;
 }
-bool can_move_left(Square character){
-  if( character.get_pos().x <= 0 + character.get_size() ){// character is at edge of window
-    return false;
-  }
-
-  return true;
-}
-bool can_move_right(Square character){
-  if(character.get_pos().x >= win_w - character.get_size() ){// character is at edge of window
+bool can_move_left(Square character,int amount){
+  if( character.get_pos().x <= 0 + character.get_size() + amount ){// character is at edge of window
     return false;
   }
 
   return true;
 }
+bool can_move_right(Square character,int amount){
+  if(character.get_pos().x >= win_w - character.get_size() - amount ){// character is at edge of window
+    return false;
+  }
+
+  return true;
+}
+
+//moves invaders randomly TODO make them struggle toward the food 
+void moveinvaders(int amount){
+   srand(time(NULL)); 
+    for(auto character: invaders){
+      character->goal_to_pos();
+      switch(rand()%4){
+        case 0:
+          if(can_move_up(*character,amount)){
+            character->move_up(amount);
+          }
+          break;
+        case 1:
+          if(can_move_left(*character,amount)){
+            character->move_left(amount);
+          }
+          break;
+        case 2:
+          if(can_move_down(*character,amount)){
+            character->move_down(amount);
+          }
+        case 3:
+          if(can_move_right(*character,amount)){
+            character->move_right(amount);
+          }
+          break;
+      }
+      character->update();
+    }
+}
+
+bool ischaractertouchingtree(Square character,Square tree){
+    GLfloat tree_x = tree.get_pos().x;
+    GLfloat tree_y = tree.get_pos().y;
+    GLfloat character_x = character.get_pos().x;
+    GLfloat character_y = character.get_pos().y;
 
 
+    GLfloat treeleftmost_x = tree_x;
+    GLfloat treerightmost_x = tree_x + tree.get_size() * 2;
+    GLfloat treebottommost_y = tree_y;
+    GLfloat treetopmost_y = tree_y + tree.get_size() * 2 ;
+
+    GLfloat characterleftmost_x = character_x;
+    GLfloat characterrightmost_x = character_x + character.get_size() * 2;
+    GLfloat characterbottommost_y = character_y ;
+    GLfloat charactertopmost_y = character_y + character.get_size() * 2;
+
+    if(charactertopmost_y > treebottommost_y){ // character approaches tree from the bottom
+      if(characterrightmost_x > treeleftmost_x){
+        cout << "Tree at: " << tree_x << " " << tree_y << endl;
+        cout << "Character at: " << character_x << " " << character_y << endl;
+        return true;
+      };
+      if(characterleftmost_x < treerightmost_x){
+        cout << "Tree at: " << tree_x << " " << tree_y << endl;
+        cout << "Character at: " << character_x << " " << character_y << endl;
+        return true;
+      }
+    }
+
+  return false;
+}
 
 
 int main(int argc, char** argv){
@@ -447,7 +566,7 @@ int main(int argc, char** argv){
   // Initialize the "magic" that glues all the code together.
   glewInit();
 
-  setupgame();   // set up shaders and display environment
+  buffersetup();   // set up shaders and display environment
 
   glutMainLoop();       // enter event loop
   return(EXIT_SUCCESS); // return successful exit code
