@@ -42,7 +42,8 @@ using std::vector;
   bool can_move_left(Square character,int amount);
   bool can_move_right(Square character,int amount);
   void moveinvaders(int amount);
-  bool ischaractertouchingtree(Square character,Square tree);
+  bool willcharacterhittree(Square character,Square tree,
+    int amountup , int amountdown ,int amountleft, int amountright);
 //
 
 //Glut setup and Callbackfuncitons 
@@ -80,10 +81,11 @@ using std::vector;
     const int NUM_BAD_GUYS = 5;
     const int NUM_GOOD_GUYS = 5;
     const int NUM_TREES = 2;
-    const int CIVILIANS_STEP_SIZE = 1;
+    const int CIVILIANS_STEP_SIZE = 5;
     const int INVADERS_STEP_SIZE = 1;
     const GLfloat CIVILIANS_SPEED = 0.09;
     const GLfloat INVADERS_SPEED = 0.09;
+    const bool COLLISON_DETECTION_ON = true;
 
   //
 //
@@ -279,7 +281,7 @@ extern "C" void key(unsigned char k, int xx, int yy){
         break;
       }
       character->update();
-      cout << "character at " << character->get_pos().x << " " << character->get_pos().y << endl;
+      //cout << "character at " << character->get_pos().x << " " << character->get_pos().y << endl;
     }
     
   }
@@ -462,33 +464,48 @@ vec3 nextselectioncolor(){
 
 //function to determine characters ability to move upward a given amount
 bool can_move_up(Square character,int amount){
-  if (character.get_pos().y >= win_h - character.get_size() - amount ){ // character is at edge of window
-    return false;
-  }
-  for (auto tree : trees){
-    //if(ischaractertouchingtree(character,*tree)){return false;}
+  if(COLLISON_DETECTION_ON){
+    if (character.get_pos().y >= win_h - character.get_size() - amount ){ // character is at edge of window
+      return false;
+    }
+    for (auto tree : trees){
+      if(willcharacterhittree(character,*tree,amount,0,0,0)){return false;}
+    }
   }
   return true; 
 }
 //function to determine characters ability to move downward a given amount
 bool can_move_down(Square character,int amount){
-  if (character.get_pos().y <= 0 + character.get_size() + amount ){// character is at edge of window
-    return false;
+  if(COLLISON_DETECTION_ON){
+    if (character.get_pos().y <= 0 + character.get_size() + amount ){// character is at edge of window
+      return false;
+    }
+    for (auto tree : trees){
+      if(willcharacterhittree(character,*tree,0,amount,0,0)){return false;}
+    }
   }
   return true;
 }
 bool can_move_left(Square character,int amount){
-  if( character.get_pos().x <= 0 + character.get_size() + amount ){// character is at edge of window
-    return false;
+  if(COLLISON_DETECTION_ON){  
+    if( character.get_pos().x <= 0 + character.get_size() + amount ){// character is at edge of window
+      return false;
+    }
+    for (auto tree : trees){
+      if(willcharacterhittree(character,*tree,0,0,amount,0)){return false;}
+    }
   }
-
   return true;
 }
 bool can_move_right(Square character,int amount){
-  if(character.get_pos().x >= win_w - character.get_size() - amount ){// character is at edge of window
-    return false;
+  if(COLLISON_DETECTION_ON){
+    if(character.get_pos().x >= win_w - character.get_size() - amount ){// character is at edge of window
+      return false;
+    }
+    for (auto tree : trees){
+      if(willcharacterhittree(character,*tree,0,0,0,amount)){return false;}
+    }
   }
-
   return true;
 }
 
@@ -522,36 +539,31 @@ void moveinvaders(int amount){
     }
 }
 
-bool ischaractertouchingtree(Square character,Square tree){
+bool willcharacterhittree(Square character,Square tree,
+    int amountup,int amountdown,int amountleft,int amountright)
+    {
     GLfloat tree_x = tree.get_pos().x;
     GLfloat tree_y = tree.get_pos().y;
     GLfloat character_x = character.get_pos().x;
     GLfloat character_y = character.get_pos().y;
 
 
-    GLfloat treeleftmost_x = tree_x;
-    GLfloat treerightmost_x = tree_x + tree.get_size() * 2;
-    GLfloat treebottommost_y = tree_y;
-    GLfloat treetopmost_y = tree_y + tree.get_size() * 2 ;
+    GLfloat treeleftmost_x = tree_x - tree.get_size();
+    GLfloat treerightmost_x = tree_x + tree.get_size();
+    GLfloat treebottommost_y = tree_y - tree.get_size();
+    GLfloat treetopmost_y = tree_y + tree.get_size();
 
-    GLfloat characterleftmost_x = character_x;
-    GLfloat characterrightmost_x = character_x + character.get_size() * 2;
-    GLfloat characterbottommost_y = character_y ;
-    GLfloat charactertopmost_y = character_y + character.get_size() * 2;
+    GLfloat characterleftmost_x = character_x - character.get_size() - amountleft ;
+    GLfloat characterrightmost_x = character_x + character.get_size() + amountright ;
+    GLfloat characterbottommost_y = character_y - character.get_size() - amountdown ;
+    GLfloat charactertopmost_y = character_y + character.get_size() + amountup;
 
-    if(charactertopmost_y > treebottommost_y){ // character approaches tree from the bottom
-      if(characterrightmost_x > treeleftmost_x){
-        cout << "Tree at: " << tree_x << " " << tree_y << endl;
-        cout << "Character at: " << character_x << " " << character_y << endl;
-        return true;
-      };
-      if(characterleftmost_x < treerightmost_x){
-        cout << "Tree at: " << tree_x << " " << tree_y << endl;
-        cout << "Character at: " << character_x << " " << character_y << endl;
-        return true;
-      }
+    bool characteronsame_xes = characterrightmost_x > treeleftmost_x && characterleftmost_x < treerightmost_x;
+    bool characteronsame_ys = charactertopmost_y > treebottommost_y && characterbottommost_y < treetopmost_y;
+
+    if(characteronsame_ys && characteronsame_xes){
+      return true;
     }
-
   return false;
 }
 

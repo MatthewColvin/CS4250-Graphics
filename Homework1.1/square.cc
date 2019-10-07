@@ -73,7 +73,7 @@ void Square::update(){
   //  if (length(dir)==0.0) {
     
   //  }else{
-  if (length(dir) > 2.0) { 
+  if (length(dir) > 6.0) { 
     dir = (compute_time())*max_speed*normalize(dir);
     // Update location
     x+=dir.x;
