@@ -35,7 +35,10 @@ class Character : public Square{
     Square(nindex,npoints,noffsetLoc,nsizeLoc,ncolorLoc){};
 
     void update(){ 
-      Square::update();   
+      Square::update();
+      if(isAlive){
+        color(healthtocolor());
+      }   
     }
 
     void kill(){ isAlive = false; };
@@ -60,13 +63,14 @@ class Character : public Square{
       // for scaling into a color
       double RGBhealth = healthpercentage * 510; 
 
-      if (RGBhealth > 255.0){
-        rvalue = 5;
+      if (RGBhealth >= 255.0){
+        rvalue = 255.0;
+        gvalue = RGBhealth;
+      }else{
+        gvalue = 255.0;
+        rvalue = 510.0 - RGBhealth;
       }
-      
-
-      gvalue = 5;
-    
+      return (vec3(rvalue/255.0,gvalue/255.0,0));
     };
 };
 
