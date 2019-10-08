@@ -45,7 +45,7 @@ class Character : public Square{
         // selection color is health plus some blue
         GLfloat selr = healthtocolor().x;
         GLfloat selg = healthtocolor().y;
-        GLfloat selb = (healthtocolor().z * 255 + 50) / 255;
+        GLfloat selb = (healthtocolor().z * 255 + 20) / 255;
         colorwhenselected = vec3(selr,selg,selb);
       }   
     }
@@ -91,6 +91,20 @@ class Character : public Square{
       }
       return (vec3(rvalue/255.0,gvalue/255.0,0));
     };
+};
+
+class Food : public Square{
+  public:
+    
+    Food() : Square(){};
+
+    Food(GLuint nindex, vec2 *npoints, GLint noffsetLoc, GLint nsizeLoc, GLint ncolorLoc) :
+    Square(nindex,npoints,noffsetLoc,nsizeLoc,ncolorLoc){};
+    
+    void eat(){ eaten = true; };
+    bool has_been_eaten(){ return (eaten);}
+  private :
+    bool eaten = false;
 };
 
 
@@ -142,7 +156,7 @@ class Character : public Square{
     vector<Character*> civilians;
     vector<Character*> invaders;
     vector<Square*> trees;
-    vector<Square*> food;
+    vector<Food*> food;
   // Data storage for our geometry for the lines
     vec2 *points;
   // Used to keep track of generated selection colors
@@ -194,10 +208,10 @@ class Character : public Square{
     bool CIVILIANS_ARE_STARVING = true;
     bool INVADERS_ARE_STARVING =true;
 
-    int CIVILIAN_HUNGER_INTERVAL = 20; 
-    int CIVILIAN_HEALTH_LOSS = 100; 
-    int INVADER_HUNGER_INTERVAL = 20;
-    int INVADER_HEATH_LOSS = 100;
+    int CIVILIAN_HUNGER_INTERVAL = 2; 
+    int CIVILIAN_HEALTH_LOSS = 50; 
+    int INVADER_HUNGER_INTERVAL = 2;
+    int INVADER_HEATH_LOSS = 50;
   //
 //
 
@@ -222,7 +236,9 @@ extern "C" void display(){
     object->draw();
   }
   for (auto object : food){
+    if(!object->has_been_eaten()){
     object->draw();
+    }
   }
 
   glutSwapBuffers ();
@@ -299,7 +315,9 @@ extern "C" void mouse(int btn, int state, int x, int y){
       object->draw(true);
     }
     for (auto object : food){
-      object->draw(true);
+      if(!object->has_been_eaten()){
+        object->draw(true);
+      }
     }
 
     
@@ -740,7 +758,7 @@ void spawn_food(int size){
   int randomx = rand() % (win_w-50) + 50 ;
   int randomy = rand() % (win_h-50) + 50;
 
-  food.push_back(new Square(0,points,offsetLoc,sizeLoc,colorLoc));
+  food.push_back(new Food(0,points,offsetLoc,sizeLoc,colorLoc));
   food[food.size()-1]->color(foodColor);
   food[food.size()-1]->change_size(INITIAL_FOOD_SIZE + size);
   food[food.size()-1]->move(randomx,randomy+INITIAL_FOOD_SIZE);
@@ -778,6 +796,7 @@ void characters_eat(){
     for(auto object: food){
       if(character_did_get_food(character,object)){
         character->add_heath((int)(object->get_size())); // character gets as much heath as food size 
+        object->eat();
       }
     }
   }
