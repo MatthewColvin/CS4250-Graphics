@@ -51,9 +51,10 @@ class Character : public Square{
     void move_invaders(int amount);
     void drop_food();
     void spawn_food(int extrasize);
-  bool will_character_hit_tree(Square character,Square tree,
+    void characters_eat();
+  bool character_will_hit_tree(Square character,Square tree,
   int amountup , int amountdown ,int amountleft, int amountright);
-  bool did_character_get_food(Square character, Square food);
+  bool character_did_get_food(Square *character, Square *food);
 
 //
 
@@ -114,6 +115,7 @@ class Character : public Square{
     const bool COLLISON_DETECTION_ON = true;
     const bool FOOD_IS_DROPPING = true;
     bool INVADERS_ARE_MOVING=true;
+    bool charactersCanEat = true;
     int secsBetweenDrops = 5;
     vec3 foodColor = vec3(184/255.0,139/255.0,94/255.0);
 
@@ -148,6 +150,9 @@ extern "C" void idle(){
     move_invaders(INVADERS_STEP_SIZE); 
   }if(FOOD_IS_DROPPING){
     drop_food();
+  }
+  if(charactersCanEat){
+    characters_eat();
   }
   
   glutPostRedisplay();
@@ -522,7 +527,7 @@ bool can_move_up(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(will_character_hit_tree(character,*tree,amount,0,0,0)){return false;}
+      if(character_will_hit_tree(character,*tree,amount,0,0,0)){return false;}
     }
   }
   return true; 
@@ -534,7 +539,7 @@ bool can_move_down(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(will_character_hit_tree(character,*tree,0,amount,0,0)){return false;}
+      if(character_will_hit_tree(character,*tree,0,amount,0,0)){return false;}
     }
   }
   return true;
@@ -545,7 +550,7 @@ bool can_move_left(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(will_character_hit_tree(character,*tree,0,0,amount,0)){return false;}
+      if(character_will_hit_tree(character,*tree,0,0,amount,0)){return false;}
     }
   }
   return true;
@@ -556,7 +561,7 @@ bool can_move_right(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(will_character_hit_tree(character,*tree,0,0,0,amount)){return false;}
+      if(character_will_hit_tree(character,*tree,0,0,0,amount)){return false;}
     }
   }
   return true;
@@ -592,7 +597,7 @@ void move_invaders(int amount){
     }
 }
 
-bool will_character_hit_tree(Square character,Square tree,
+bool character_will_hit_tree(Square character,Square tree,
 int amountup,int amountdown,int amountleft,int amountright){ 
     GLfloat tree_x = tree.get_pos().x;
     GLfloat tree_y = tree.get_pos().y;
@@ -657,21 +662,21 @@ void spawn_food(int size){
 }
 
 
-bool did_character_get_food(Square character, Square food){
-  GLfloat tree_x = food.get_pos().x;
-  GLfloat tree_y = food.get_pos().y;
-  GLfloat character_x = character.get_pos().x;
-  GLfloat character_y = character.get_pos().y;
+bool character_did_get_food(Square* character, Square* food){
+  GLfloat tree_x = food->get_pos().x;
+  GLfloat tree_y = food->get_pos().y;
+  GLfloat character_x = character->get_pos().x;
+  GLfloat character_y = character->get_pos().y;
 
-  GLfloat treeleftmost_x = tree_x - food.get_size();
-  GLfloat treerightmost_x = tree_x + food.get_size();
-  GLfloat treebottommost_y = tree_y - food.get_size();
-  GLfloat treetopmost_y = tree_y + food.get_size();
+  GLfloat treeleftmost_x = tree_x - food->get_size();
+  GLfloat treerightmost_x = tree_x + food->get_size();
+  GLfloat treebottommost_y = tree_y - food->get_size();
+  GLfloat treetopmost_y = tree_y + food->get_size();
 
-  GLfloat characterleftmost_x = character_x - character.get_size();
-  GLfloat characterrightmost_x = character_x + character.get_size();
-  GLfloat characterbottommost_y = character_y - character.get_size();
-  GLfloat charactertopmost_y = character_y + character.get_size();
+  GLfloat characterleftmost_x = character_x - character->get_size();
+  GLfloat characterrightmost_x = character_x + character->get_size();
+  GLfloat characterbottommost_y = character_y - character->get_size();
+  GLfloat charactertopmost_y = character_y + character->get_size();
 
   bool characteronsame_xes = characterrightmost_x > treeleftmost_x && characterleftmost_x < treerightmost_x;
   bool characteronsame_ys = charactertopmost_y > treebottommost_y && characterbottommost_y < treetopmost_y;
@@ -681,6 +686,17 @@ bool did_character_get_food(Square character, Square food){
   }
   return false;
 }
+
+void characters_eat(){
+  for (auto character:civilians){
+    for(auto object: food){
+      if(character_did_get_food(character,object)){
+        delete object;
+      }
+    }
+  }
+}
+
 
 
 int main(int argc, char** argv){
