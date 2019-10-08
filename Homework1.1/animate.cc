@@ -16,13 +16,30 @@ using std::cout;
 using std::endl;
 using std::vector;
 
+class Stopwatch{
+  public:
+  inline Stopwatch(){ reset();  }
+  inline void reset(){t = time(NULL);}
+  inline int get_time(){  return ( time(NULL) - t);  }
+  private:
+  time_t t;
+};
 
+class Character : public Square{
+  Character();
+
+  private:
+    int health;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Game functions 
   void buffersetup();
   void setupmap();
   void clearmap();
   void processSelection(unsigned char PixelColor[], int btn);
   vec3 nextselectioncolor();
+
 //
 
 //Character Movement Functions
@@ -33,8 +50,11 @@ using std::vector;
   //Idle animations
     void move_invaders(int amount);
     void drop_food();
-  bool willcharacterhittree(Square character,Square tree,
+    void spawn_food(int extrasize);
+  bool will_character_hit_tree(Square character,Square tree,
   int amountup , int amountdown ,int amountleft, int amountright);
+  bool did_character_get_food(Square character, Square food);
+
 //
 
 //Glut setup and Callbackfuncitons 
@@ -76,7 +96,7 @@ using std::vector;
       GLint colorLoc;
 
   // Game Timer
-    clock_t t;
+    Stopwatch stopwatch;
   // Custom Game Variables Setup 
     //cammelCase - can be canged while game is running
     //THIS_NOTATION - cannot be changed so must be set before starting
@@ -94,7 +114,8 @@ using std::vector;
     const bool COLLISON_DETECTION_ON = true;
     const bool FOOD_IS_DROPPING = true;
     bool INVADERS_ARE_MOVING=true;
-    int timeBetweenDrops = 15;
+    int secsBetweenDrops = 5;
+    vec3 foodColor = vec3(184/255.0,139/255.0,94/255.0);
 
   //
 //
@@ -143,18 +164,21 @@ void processSelection(unsigned char PixelColor[], int btn){
       character->notSelected();
     }
   } 
- for (auto character : invaders){
+  for (auto character : invaders){
     if (cmpcolor(PixelColor,character->getSelectColor())){
       cout << "Invader at:" << character->get_pos().x << " " << character->get_pos().y << endl;
     }
   }
   for (auto object : trees){
     if (cmpcolor(PixelColor,object->getSelectColor())){
-    cout << "Tree at:" << object->get_pos().x << " " << object->get_pos().y << endl;
+      cout << "Tree at:" << object->get_pos().x << " " << object->get_pos().y << endl;
     }
   }
-
-
+  for (auto object : food){
+    if (cmpcolor(PixelColor,object->getSelectColor())){
+      cout << "Food at:" << object->get_pos().x << " " << object->get_pos().y << endl;
+    }
+  }
 }
 
 // Mouse callback, implements selection by using colors in the back buffer.
@@ -498,7 +522,7 @@ bool can_move_up(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(willcharacterhittree(character,*tree,amount,0,0,0)){return false;}
+      if(will_character_hit_tree(character,*tree,amount,0,0,0)){return false;}
     }
   }
   return true; 
@@ -510,7 +534,7 @@ bool can_move_down(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(willcharacterhittree(character,*tree,0,amount,0,0)){return false;}
+      if(will_character_hit_tree(character,*tree,0,amount,0,0)){return false;}
     }
   }
   return true;
@@ -521,7 +545,7 @@ bool can_move_left(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(willcharacterhittree(character,*tree,0,0,amount,0)){return false;}
+      if(will_character_hit_tree(character,*tree,0,0,amount,0)){return false;}
     }
   }
   return true;
@@ -532,7 +556,7 @@ bool can_move_right(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(willcharacterhittree(character,*tree,0,0,0,amount)){return false;}
+      if(will_character_hit_tree(character,*tree,0,0,0,amount)){return false;}
     }
   }
   return true;
@@ -568,7 +592,7 @@ void move_invaders(int amount){
     }
 }
 
-bool willcharacterhittree(Square character,Square tree,
+bool will_character_hit_tree(Square character,Square tree,
 int amountup,int amountdown,int amountleft,int amountright){ 
     GLfloat tree_x = tree.get_pos().x;
     GLfloat tree_y = tree.get_pos().y;
@@ -594,40 +618,70 @@ int amountup,int amountdown,int amountleft,int amountright){
     }
   return false;
 }
-
+// This function will call the function spawn_food to create food on the
+// screen randomly
 void drop_food(){
-  srand(time(NULL));
-  t = clock() - t;
-  if(t > timeBetweenDrops){
-    int randomx = rand() % (win_w-50) + 50 ;
-    int randomy = rand() % (win_h-50) + 50;
-    
-    
+  if(stopwatch.get_time() > secsBetweenDrops){
     switch (rand() % 4){
-    case 0: // generate a small bit of food 
-      food.push_back(new Square(0,points,offsetLoc,sizeLoc,colorLoc));
-      food[food.size()-1]->change_size(INITIAL_CHARACTER_SIZE);
-      food[food.size()-1]->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
-      food[food.size()-1]->setSpeed(CIVILIANS_SPEED);
-      food[food.size()-1]->selectColor(nextselectioncolor());
-    break;
-    case 1:
-    
-    break;
-    case 2:
-    
-    break;
-    case 3:
-    
-    break;
-    default:
-    break;
+      case 0: // generate a small bit of food 
+        spawn_food(0);
+      case 1:
+        if(rand() % 2 == 0)
+        spawn_food(5);
+      break;
+      case 2:
+        spawn_food(10);
+      break;
+      case 3:
+        if (rand()%2 == 0 && rand()%2 == 0 ) 
+        spawn_food(25);
+      break;
+      default:
+      break;
     }
+  stopwatch.reset(); 
   }
-
-  t = clock() - clock();  
-  
 }
+// Will make food appear at random xes and ys  
+// on the screen at the initail size + a given size 
+void spawn_food(int size){
+  srand(time(NULL));
+  int randomx = rand() % (win_w-50) + 50 ;
+  int randomy = rand() % (win_h-50) + 50;
+
+  food.push_back(new Square(0,points,offsetLoc,sizeLoc,colorLoc));
+  food[food.size()-1]->color(foodColor);
+  food[food.size()-1]->change_size(INITIAL_FOOD_SIZE + size);
+  food[food.size()-1]->move(randomx,randomy+INITIAL_FOOD_SIZE);
+  food[food.size()-1]->selectColor(nextselectioncolor());
+}
+
+
+bool did_character_get_food(Square character, Square food){
+  GLfloat tree_x = food.get_pos().x;
+  GLfloat tree_y = food.get_pos().y;
+  GLfloat character_x = character.get_pos().x;
+  GLfloat character_y = character.get_pos().y;
+
+  GLfloat treeleftmost_x = tree_x - food.get_size();
+  GLfloat treerightmost_x = tree_x + food.get_size();
+  GLfloat treebottommost_y = tree_y - food.get_size();
+  GLfloat treetopmost_y = tree_y + food.get_size();
+
+  GLfloat characterleftmost_x = character_x - character.get_size();
+  GLfloat characterrightmost_x = character_x + character.get_size();
+  GLfloat characterbottommost_y = character_y - character.get_size();
+  GLfloat charactertopmost_y = character_y + character.get_size();
+
+  bool characteronsame_xes = characterrightmost_x > treeleftmost_x && characterleftmost_x < treerightmost_x;
+  bool characteronsame_ys = charactertopmost_y > treebottommost_y && characterbottommost_y < treetopmost_y;
+
+  if(characteronsame_ys && characteronsame_xes){
+    return true;
+  }
+  return false;
+}
+
 
 int main(int argc, char** argv){
   // Several people forgot to put in the following line.  This is an
