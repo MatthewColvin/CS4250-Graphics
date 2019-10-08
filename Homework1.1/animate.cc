@@ -26,11 +26,50 @@ class Stopwatch{
 };
 
 class Character : public Square{
-  Character();
+  public:
+    Character(int max_health):Square(){
+      isAlive = true;
+      currentheath = max_health;
+    };
+    Character(GLuint nindex, vec2 *npoints, GLint noffsetLoc, GLint nsizeLoc, GLint ncolorLoc,int max_health) :
+    Square(nindex,npoints,noffsetLoc,nsizeLoc,ncolorLoc){};
+
+    void update(){ 
+      Square::update();   
+    }
+
+    void kill(){ isAlive = false; };
+    bool is_alive(){return isAlive;} 
 
   private:
-    int health;
+    bool isAlive;
+    int max_health;
+    int currentheath; 
+    vec3 healthtocolor(){
+      
+      if(currentheath >= max_health){
+        currentheath = max_health;
+        return(vec3(1.0,0.0,0.0)); 
+      }
+      
+      double healthpercentage = currentheath/max_health;
+      
+      double rvalue, gvalue;
+      
+      // This health is just a number between 0 and 510 
+      // for scaling into a color
+      double RGBhealth = healthpercentage * 510; 
+
+      if (RGBhealth > 255.0){
+        rvalue = 5;
+      }
+      
+
+      gvalue = 5;
+    
+    };
 };
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Game functions 
@@ -74,9 +113,9 @@ class Character : public Square{
 
 //Global Variables 
   bool clearscreen=true;
-  //vector to hold all the characters
-    vector<Square*> civilians;
-    vector<Square*> invaders;
+  // Character and object vectors ////////////
+    vector<Character*> civilians;
+    vector<Character*> invaders;
     vector<Square*> trees;
     vector<Square*> food;
   // Data storage for our geometry for the lines
@@ -88,13 +127,10 @@ class Character : public Square{
     int win_h=900;
     int win_w=900;
     int Glut_win_id;
-  // Crunch time hack to make characters able to be generated any time.
-    // Offset of square  
-      GLint offsetLoc;
-    // Size of square
-      GLint sizeLoc;
-    // Color of square 
-      GLint colorLoc;
+  // Offsets to uniforms
+    GLint offsetLoc;
+    GLint sizeLoc;
+    GLint colorLoc;
 
   // Game Timer
     Stopwatch stopwatch;
@@ -118,6 +154,8 @@ class Character : public Square{
     bool charactersCanEat = true;
     int secsBetweenDrops = 5;
     vec3 foodColor = vec3(184/255.0,139/255.0,94/255.0);
+    int CIVILIANS_MAX_HEALTH = 1000;
+    int INVADERS_MAX_HEALTH = 1000;
 
   //
 //
@@ -449,7 +487,7 @@ void setupmap(){
     randomx = rand() % (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE ;
     randomy = rand() % win_h/3; //spawn good guys in the bottom half
     
-    civilians.push_back(new Square(0,points,offsetLoc,sizeLoc,colorLoc));
+    civilians.push_back(new Character(0,points,offsetLoc,sizeLoc,colorLoc,CIVILIANS_MAX_HEALTH));
     civilians[i]->change_size(INITIAL_CHARACTER_SIZE);
     civilians[i]->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
     civilians[i]->setSpeed(CIVILIANS_SPEED);
@@ -460,7 +498,7 @@ void setupmap(){
     randomx = rand() %  (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE;
     randomy = rand() % win_h/3 + win_h/2 ;// spawn bad characters in the top half
     
-    invaders.push_back(new Square(0,points,offsetLoc,sizeLoc,colorLoc));
+    invaders.push_back(new Character(0,points,offsetLoc,sizeLoc,colorLoc,INVADERS_MAX_HEALTH));
     invaders[i]->change_size(INITIAL_CHARACTER_SIZE);
     invaders[i]->move(randomx,randomy-INITIAL_CHARACTER_SIZE);
     invaders[i]->color(BAD_GUY_COLOR);
