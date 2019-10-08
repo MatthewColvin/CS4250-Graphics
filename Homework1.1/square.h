@@ -51,6 +51,9 @@ private:
   GLint goal_x;
   GLint goal_y;
 
+protected:
+  vec3 colorwhenselected = vec3(0.0,1.0,1.0);
+
 };
 
 #endif

@@ -31,18 +31,37 @@ class Character : public Square{
       isAlive = true;
       currentheath = max_health;
     };
-    Character(GLuint nindex, vec2 *npoints, GLint noffsetLoc, GLint nsizeLoc, GLint ncolorLoc,int max_health) :
-    Square(nindex,npoints,noffsetLoc,nsizeLoc,ncolorLoc){};
+    Character(GLuint nindex, vec2 *npoints, GLint noffsetLoc, GLint nsizeLoc, GLint ncolorLoc,int maxhealth) :
+    Square(nindex,npoints,noffsetLoc,nsizeLoc,ncolorLoc){
+      max_health = maxhealth;
+      currentheath = max_health;
+      isAlive=true;
+    };
 
     void update(){ 
       Square::update();
       if(isAlive){
         color(healthtocolor());
+        // selection color is health plus some blue
+        GLfloat selr = healthtocolor().x;
+        GLfloat selg = healthtocolor().y;
+        GLfloat selb = (healthtocolor().z * 255 + 50) / 255;
+        colorwhenselected = vec3(selr,selg,selb);
       }   
     }
 
     void kill(){ isAlive = false; };
     bool is_alive(){return isAlive;} 
+
+    void sub_health (int damage){
+      currentheath-=damage;
+      if(currentheath < 0){
+        kill();
+      }
+    }
+    void add_heath (int amount){
+      currentheath+=amount;
+    }
 
   private:
     bool isAlive;
@@ -52,18 +71,18 @@ class Character : public Square{
       
       if(currentheath >= max_health){
         currentheath = max_health;
-        return(vec3(1.0,0.0,0.0)); 
+        return(vec3(0.0,1.0,0.0)); 
       }
       
-      double healthpercentage = currentheath/max_health;
+      GLfloat healthpercentage = currentheath/(GLfloat)max_health;
       
-      double rvalue, gvalue;
+      GLfloat rvalue, gvalue;
       
       // This health is just a number between 0 and 510 
       // for scaling into a color
-      double RGBhealth = healthpercentage * 510; 
+      GLfloat RGBhealth = healthpercentage * 510; 
 
-      if (RGBhealth >= 255.0){
+      if (RGBhealth <= 255.0){
         rvalue = 255.0;
         gvalue = RGBhealth;
       }else{
@@ -79,7 +98,6 @@ class Character : public Square{
 // Game functions 
   void buffersetup();
   void setupmap();
-  void clearmap();
   void processSelection(unsigned char PixelColor[], int btn);
   vec3 nextselectioncolor();
 
@@ -92,12 +110,15 @@ class Character : public Square{
   bool can_move_right(Square character,int amount);
   //Idle animations
     void move_invaders(int amount);
+    void move_civilians();
     void drop_food();
     void spawn_food(int extrasize);
     void characters_eat();
+    void slowly_starve_characters();
   bool character_will_hit_tree(Square character,Square tree,
   int amountup , int amountdown ,int amountleft, int amountright);
   bool character_did_get_food(Square *character, Square *food);
+  
 
 //
 
@@ -136,17 +157,26 @@ class Character : public Square{
     GLint sizeLoc;
     GLint colorLoc;
 
-  // Game Timer
-    Stopwatch stopwatch;
+  // Game Timers
+    Stopwatch foodtimer;
+    Stopwatch civilanstarver;
+    Stopwatch invaderstarver;
   // Custom Game Variables Setup 
     //cammelCase - can be canged while game is running
     //THIS_NOTATION - cannot be changed so must be set before starting
     //Some may be easy to make editable.
-    const int INITIAL_TREE_SIZE = 40; 
-    const int INITIAL_CHARACTER_SIZE = 20;
-    const int INITIAL_FOOD_SIZE = 5;
-    const int NUM_BAD_GUYS = 5;
-    const int NUM_GOOD_GUYS = 5;
+      // TREE ATTRIBUTES
+      const int INITIAL_TREE_SIZE = 40; 
+      // INVADER ATTRIBUTES
+      const int NUM_BAD_GUYS = 2;
+
+      // CIVILIANS ATTRIBUTES
+      const int INITIAL_CHARACTER_SIZE = 20;
+      const int NUM_GOOD_GUYS = 2;
+
+      // FOOD ATTRIBUTES
+      const int INITIAL_FOOD_SIZE = 5;
+
     const int NUM_TREES = 2;
     const int CIVILIANS_STEP_SIZE = 5;
     const int INVADERS_STEP_SIZE = 1;
@@ -155,12 +185,19 @@ class Character : public Square{
     const bool COLLISON_DETECTION_ON = true;
     const bool FOOD_IS_DROPPING = true;
     bool INVADERS_ARE_MOVING=true;
+    bool CIVILIANS_ARE_MOVING=false ; // has to start as fasle for some reason they are just moving at beginning
     bool charactersCanEat = true;
     int secsBetweenDrops = 5;
     vec3 foodColor = vec3(184/255.0,139/255.0,94/255.0);
     int CIVILIANS_MAX_HEALTH = 1000;
     int INVADERS_MAX_HEALTH = 1000;
+    bool CIVILIANS_ARE_STARVING = true;
+    bool INVADERS_ARE_STARVING =true;
 
+    int CIVILIAN_HUNGER_INTERVAL = 20; 
+    int CIVILIAN_HEALTH_LOSS = 100; 
+    int INVADER_HUNGER_INTERVAL = 20;
+    int INVADER_HEATH_LOSS = 100;
   //
 //
 
@@ -172,10 +209,14 @@ extern "C" void display(){
   
   //Draw all the characters
   for (auto character : civilians){
-    character->draw();
+    if(character->is_alive()){
+      character->draw();
+    }
   }
   for(auto character : invaders){
-    character->draw();
+    if(character->is_alive()){
+      character->draw();
+    }
   }
   for(auto object : trees){
     object->draw();
@@ -190,11 +231,18 @@ extern "C" void display(){
 extern "C" void idle(){
   if (INVADERS_ARE_MOVING) {
     move_invaders(INVADERS_STEP_SIZE); 
-  }if(FOOD_IS_DROPPING){
+  }
+  if(CIVILIANS_ARE_MOVING){
+    move_civilians();
+  }
+  if(FOOD_IS_DROPPING){
     drop_food();
   }
   if(charactersCanEat){
     characters_eat();
+  }
+  if (CIVILIANS_ARE_STARVING || INVADERS_ARE_STARVING){
+    slowly_starve_characters();
   }
   
   glutPostRedisplay();
@@ -238,10 +286,14 @@ extern "C" void mouse(int btn, int state, int x, int y){
 
     // draw the character in the selection color in the back buffer
     for (auto character : civilians){
-      character->draw(true);
+      if(character->is_alive()){
+        character->draw(true);
+      }
     }
     for (auto character : invaders){
-      character->draw(true);
+      if(character->is_alive()){
+        character->draw(true);
+      }
     }
     for (auto object : trees){
       object->draw(true);
@@ -367,8 +419,7 @@ extern "C" void key(unsigned char k, int xx, int yy){
         }
         break;
       }
-      character->update();
-      //cout << "character at " << character->get_pos().x << " " << character->get_pos().y << endl;
+      CIVILIANS_ARE_MOVING = true;
     }
     
   }
@@ -494,6 +545,7 @@ void setupmap(){
     civilians.push_back(new Character(0,points,offsetLoc,sizeLoc,colorLoc,CIVILIANS_MAX_HEALTH));
     civilians[i]->change_size(INITIAL_CHARACTER_SIZE);
     civilians[i]->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
+    civilians[i]->goal_to_pos(); 
     civilians[i]->setSpeed(CIVILIANS_SPEED);
     civilians[i]->selectColor(nextselectioncolor());
   }
@@ -524,21 +576,7 @@ void setupmap(){
 
 }
 
-void clearmap(){
-  for (auto character : invaders){
-    delete character;
-  }
-  for (auto character : civilians){
-    delete character;
-  }
-  for (auto object : trees){
-    delete object;
-  }
-  for (auto object : food){
-    delete object;
-  }
 
-}
 
 // generates a selection color different from all others
 vec3 nextselectioncolor(){
@@ -639,6 +677,12 @@ void move_invaders(int amount){
     }
 }
 
+void move_civilians(){
+  for (auto character : civilians){
+    character->update();
+  }
+}
+
 bool character_will_hit_tree(Square character,Square tree,
 int amountup,int amountdown,int amountleft,int amountright){ 
     GLfloat tree_x = tree.get_pos().x;
@@ -668,7 +712,7 @@ int amountup,int amountdown,int amountleft,int amountright){
 // This function will call the function spawn_food to create food on the
 // screen randomly
 void drop_food(){
-  if(stopwatch.get_time() > secsBetweenDrops){
+  if(foodtimer.get_time() > secsBetweenDrops){
     switch (rand() % 4){
       case 0: // generate a small bit of food 
         spawn_food(0);
@@ -686,7 +730,7 @@ void drop_food(){
       default:
       break;
     }
-  stopwatch.reset(); 
+  foodtimer.reset(); 
   }
 }
 // Will make food appear at random xes and ys  
@@ -733,12 +777,34 @@ void characters_eat(){
   for (auto character:civilians){
     for(auto object: food){
       if(character_did_get_food(character,object)){
-        delete object;
+        character->add_heath((int)(object->get_size())); // character gets as much heath as food size 
       }
     }
   }
 }
 
+void slowly_starve_characters(){
+  
+  if(INVADERS_ARE_STARVING && invaderstarver.get_time() > INVADER_HUNGER_INTERVAL){
+    for (auto character : invaders){
+      if(character->is_alive()){
+        character->sub_health(INVADER_HEATH_LOSS);
+      }
+    }
+  invaderstarver.reset();  
+  }
+
+  if(CIVILIANS_ARE_STARVING && civilanstarver.get_time() > CIVILIAN_HUNGER_INTERVAL){
+    for (auto character : civilians){
+      if(character->is_alive()){
+        character->sub_health(CIVILIAN_HEALTH_LOSS);
+      }
+    }
+  civilanstarver.reset();  
+  }
+
+
+}
 
 
 int main(int argc, char** argv){

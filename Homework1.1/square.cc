@@ -57,7 +57,10 @@ void Square::draw(bool select_mode){
   if (select_mode) {
     glUniform4f(colorLoc, sr, sg, sb, 1.0);
   } else if (selected) {
-    glUniform4f(colorLoc, 0.0, 1.0, 1.0, 1.0);
+    r = colorwhenselected.x;
+    g = colorwhenselected.y;
+    b = colorwhenselected.z;
+    glUniform4f(colorLoc, 0.0, r, g, b);
   } else {
     glUniform4f(colorLoc, r, g, b, 1.0);
   }
