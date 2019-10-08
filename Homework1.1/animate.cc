@@ -27,9 +27,7 @@ class Stopwatch{
 
 class Character : public Square{
   public:
-    Character(int max_health):Square(){
-      isAlive = true;
-      currentheath = max_health;
+    Character():Square(){
     };
     Character(GLuint nindex, vec2 *npoints, GLint noffsetLoc, GLint nsizeLoc, GLint ncolorLoc,int maxhealth) :
     Square(nindex,npoints,noffsetLoc,nsizeLoc,ncolorLoc){
@@ -38,17 +36,6 @@ class Character : public Square{
       isAlive=true;
     };
 
-    void update(){ 
-      Square::update();
-      if(isAlive){
-        color(healthtocolor());
-        // selection color is health plus some blue
-        GLfloat selr = healthtocolor().x;
-        GLfloat selg = healthtocolor().y;
-        GLfloat selb = (healthtocolor().z * 255 + 20) / 255;
-        colorwhenselected = vec3(selr,selg,selb);
-      }   
-    }
 
     void kill(){ isAlive = false; };
     bool is_alive(){return isAlive;} 
@@ -63,10 +50,34 @@ class Character : public Square{
       currentheath+=amount;
     }
 
-  private:
+  protected:
     bool isAlive;
     int max_health;
     int currentheath; 
+};
+
+class Civilian : public Character{
+  public:
+    Civilian(int max_health):Character(){
+    };
+    Civilian(GLuint nindex, vec2 *npoints, GLint noffsetLoc, GLint nsizeLoc, GLint ncolorLoc,int maxhealth) :
+    Character(nindex,npoints,noffsetLoc,nsizeLoc,ncolorLoc,maxhealth){
+    };
+
+    void update(){ 
+      Square::update();
+      if(isAlive){
+        color(healthtocolor());
+        // selection color is health plus some blue
+        GLfloat selr = healthtocolor().x;
+        GLfloat selg = healthtocolor().y;
+        GLfloat selb = (healthtocolor().z * 255 + 20) / 255;
+        colorwhenselected = vec3(selr,selg,selb);
+      }   
+    }
+
+  private:
+    
     vec3 healthtocolor(){
       
       if(currentheath >= max_health){
@@ -90,6 +101,54 @@ class Character : public Square{
         rvalue = 510.0 - RGBhealth;
       }
       return (vec3(rvalue/255.0,gvalue/255.0,0));
+    };
+};
+
+class Invader: public Character{
+  public:
+    Invader(int max_health):Character(){
+    };
+    Invader(GLuint nindex, vec2 *npoints, GLint noffsetLoc, GLint nsizeLoc, GLint ncolorLoc,int maxhealth) :
+    Character(nindex,npoints,noffsetLoc,nsizeLoc,ncolorLoc,maxhealth){
+    };
+
+    void update(){ 
+      Square::update();
+      if(isAlive){
+        color(healthtocolor());
+        // selection color is health plus some blue
+        GLfloat selr = healthtocolor().x;
+        GLfloat selg = healthtocolor().y;
+        GLfloat selb = (healthtocolor().z * 255 + 20) / 255;
+        colorwhenselected = vec3(selr,selg,selb);
+      }   
+    }
+
+
+  private:
+    vec3 healthtocolor(){
+      
+      if(currentheath >= max_health){
+        currentheath = max_health;
+        return(vec3(0.0,0.0,1.0)); 
+      }
+      
+      GLfloat healthpercentage = currentheath/(GLfloat)max_health;
+      
+      GLfloat rvalue, bvalue;
+      
+      // This health is just a number between 0 and 510 
+      // for scaling into a color
+      GLfloat RGBhealth = healthpercentage * 510; 
+
+      if (RGBhealth <= 255.0){
+        rvalue = 255.0;
+        bvalue = RGBhealth;
+      }else{
+        bvalue = 255.0;
+        rvalue = 510.0 - RGBhealth;
+      }
+      return (vec3(rvalue/255.0,0,bvalue/255.0));
     };
 };
 
@@ -153,8 +212,8 @@ class Food : public Square{
 //Global Variables 
   bool clearscreen=true;
   // Character and object vectors ////////////
-    vector<Character*> civilians;
-    vector<Character*> invaders;
+    vector<Civilian*> civilians;
+    vector<Invader*> invaders;
     vector<Square*> trees;
     vector<Food*> food;
   // Data storage for our geometry for the lines
@@ -560,7 +619,7 @@ void setupmap(){
     randomx = rand() % (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE ;
     randomy = rand() % win_h/3; //spawn good guys in the bottom half
     
-    civilians.push_back(new Character(0,points,offsetLoc,sizeLoc,colorLoc,CIVILIANS_MAX_HEALTH));
+    civilians.push_back(new Civilian(0,points,offsetLoc,sizeLoc,colorLoc,CIVILIANS_MAX_HEALTH));
     civilians[i]->change_size(INITIAL_CHARACTER_SIZE);
     civilians[i]->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
     civilians[i]->goal_to_pos(); 
@@ -572,7 +631,7 @@ void setupmap(){
     randomx = rand() %  (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE;
     randomy = rand() % win_h/3 + win_h/2 ;// spawn bad characters in the top half
     
-    invaders.push_back(new Character(0,points,offsetLoc,sizeLoc,colorLoc,INVADERS_MAX_HEALTH));
+    invaders.push_back(new Invader(0,points,offsetLoc,sizeLoc,colorLoc,INVADERS_MAX_HEALTH));
     invaders[i]->change_size(INITIAL_CHARACTER_SIZE);
     invaders[i]->move(randomx,randomy-INITIAL_CHARACTER_SIZE);
     invaders[i]->color(BAD_GUY_COLOR);
@@ -754,14 +813,20 @@ void drop_food(){
 // Will make food appear at random xes and ys  
 // on the screen at the initail size + a given size 
 void spawn_food(int size){
-  srand(time(NULL));
-  int randomx = rand() % (win_w-50) + 50 ;
-  int randomy = rand() % (win_h-50) + 50;
+  if(rand()%2 == 0){ // attempt to make food a bit more random
+    srand(foodtimer.get_time());
+  }else{
+    srand(time(NULL));
+  }
+
+  int randomx = rand() % (win_w - INITIAL_FOOD_SIZE - size) + INITIAL_FOOD_SIZE + size;
+  int randomy = rand() % (win_h - INITIAL_FOOD_SIZE - size) + INITIAL_FOOD_SIZE + size;
 
   food.push_back(new Food(0,points,offsetLoc,sizeLoc,colorLoc));
   food[food.size()-1]->color(foodColor);
   food[food.size()-1]->change_size(INITIAL_FOOD_SIZE + size);
   food[food.size()-1]->move(randomx,randomy+INITIAL_FOOD_SIZE);
+  food[food.size()-1]->goal_to_pos();
   food[food.size()-1]->selectColor(nextselectioncolor());
 }
 
