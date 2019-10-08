@@ -28,6 +28,7 @@ void Square::init_points(){
 // Default constructor
 Square::Square() : Object(), goal_x(0.0), goal_y(0.0){
   init_points();
+  vec3 colorwhenselected = vec3(0.0,1.0,1.0);
 }
 
 // Constructor if start of square vertices aren't at 0.
@@ -57,10 +58,11 @@ void Square::draw(bool select_mode){
   if (select_mode) {
     glUniform4f(colorLoc, sr, sg, sb, 1.0);
   } else if (selected) {
-    r = colorwhenselected.x;
-    g = colorwhenselected.y;
-    b = colorwhenselected.z;
-    glUniform4f(colorLoc, 0.0, r, g, b);
+    GLfloat red = colorwhenselected.x;
+    GLfloat green = colorwhenselected.y;
+    GLfloat blue = colorwhenselected.z;
+    GLfloat alpha = colorwhenselected.w;
+    glUniform4f(colorLoc, red, green, blue ,alpha);
   } else {
     glUniform4f(colorLoc, r, g, b, 1.0);
   }

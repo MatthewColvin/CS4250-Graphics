@@ -42,7 +42,7 @@ class Character : public Square{
 
     void sub_health (int damage){
       currentheath-=damage;
-      if(currentheath < 0){
+      if(currentheath <= 0){
         kill();
       }
     }
@@ -65,15 +65,15 @@ class Civilian : public Character{
     };
 
     void update(){ 
-      Square::update();
       if(isAlive){
         color(healthtocolor());
         // selection color is health plus some blue
         GLfloat selr = healthtocolor().x;
         GLfloat selg = healthtocolor().y;
-        GLfloat selb = (healthtocolor().z * 255 + 20) / 255;
+        GLfloat selb = (healthtocolor().z * 255 + 50) / 255;
         colorwhenselected = vec3(selr,selg,selb);
-      }   
+      }
+      Square::update();   
     }
 
   private:
@@ -113,15 +113,10 @@ class Invader: public Character{
     };
 
     void update(){ 
-      Square::update();
       if(isAlive){
         color(healthtocolor());
-        // selection color is health plus some blue
-        GLfloat selr = healthtocolor().x;
-        GLfloat selg = healthtocolor().y;
-        GLfloat selb = (healthtocolor().z * 255 + 20) / 255;
-        colorwhenselected = vec3(selr,selg,selb);
       }   
+      Square::update();
     }
 
 
@@ -258,7 +253,7 @@ class Food : public Square{
     const bool COLLISON_DETECTION_ON = true;
     const bool FOOD_IS_DROPPING = true;
     bool INVADERS_ARE_MOVING=true;
-    bool CIVILIANS_ARE_MOVING=false ; // has to start as fasle for some reason they are just moving at beginning
+    bool CIVILIANS_ARE_MOVING=true; 
     bool charactersCanEat = true;
     int secsBetweenDrops = 5;
     vec3 foodColor = vec3(184/255.0,139/255.0,94/255.0);
@@ -496,7 +491,6 @@ extern "C" void key(unsigned char k, int xx, int yy){
         }
         break;
       }
-      CIVILIANS_ARE_MOVING = true;
     }
     
   }
