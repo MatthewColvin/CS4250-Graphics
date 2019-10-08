@@ -1,15 +1,11 @@
 #ifndef SQUARE_H
 #define SQUARE_H
-//Class definition of square object 
-// 
-// Written by Prof. David M. Chelberg
-// 
+
 // Assumes that the square object was defined in the VAO at location
 // index
 //
 // must call goal_to_pos in order to use any move_... functions
 //
-// last-modified: Fri Oct 25 15:22:05 2013
 
 #include <Angel.h>
 #include <iostream>
@@ -52,7 +48,6 @@ public:
 private:
   static bool inited;
 
-  // location of where square wants to go
   GLint goal_x;
   GLint goal_y;
 
