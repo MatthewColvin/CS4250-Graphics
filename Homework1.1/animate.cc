@@ -234,38 +234,42 @@ class Food : public Square{
     //THIS_NOTATION - cannot be changed so must be set before starting
     //Some may be easy to make editable.
       // TREE ATTRIBUTES
-      const int INITIAL_TREE_SIZE = 40; 
-      // INVADER ATTRIBUTES
-      const int NUM_BAD_GUYS = 2;
+        const int INITIAL_TREE_SIZE = 40; 
+        const vec3 TREE_COLOR = vec3(50/255.0,77/255.0,43/255.0);
+        const int NUM_TREES = 6;
 
+      // INVADER ATTRIBUTES
+        const int NUM_BAD_GUYS = 5;
+        const int INVADERS_STEP_SIZE = 1;
+        const GLfloat INVADERS_SPEED = 0.09;
+        bool INVADERS_ARE_MOVING=true;
+        int INVADERS_MAX_HEALTH = 1000;
+        int INVADER_HUNGER_INTERVAL = 2;
+        int INVADER_HEATH_LOSS = 25;
+        bool INVADERS_ARE_STARVING =true;
       // CIVILIANS ATTRIBUTES
-      const int INITIAL_CHARACTER_SIZE = 20;
-      const int NUM_GOOD_GUYS = 2;
+        const int INITIAL_CHARACTER_SIZE = 20;
+        const int NUM_GOOD_GUYS = 2;
+        const int CIVILIANS_STEP_SIZE = 10;
+        const GLfloat CIVILIANS_SPEED = 0.09;
+        bool CIVILIANS_ARE_MOVING=true; 
+        int CIVILIANS_MAX_HEALTH = 1000;
+        bool CIVILIANS_ARE_STARVING = true;
+        int CIVILIAN_HUNGER_INTERVAL = 2; 
+        int CIVILIAN_HEALTH_LOSS = 100; 
 
       // FOOD ATTRIBUTES
-      const int INITIAL_FOOD_SIZE = 5;
+        const int INITIAL_FOOD_SIZE = 5;
+        const bool FOOD_IS_DROPPING = true;
+        int secsBetweenDrops = 5;
+        vec3 foodColor = vec3(184/255.0,139/255.0,94/255.0);
 
-    const int NUM_TREES = 2;
-    const int CIVILIANS_STEP_SIZE = 5;
-    const int INVADERS_STEP_SIZE = 1;
-    const GLfloat CIVILIANS_SPEED = 0.09;
-    const GLfloat INVADERS_SPEED = 0.09;
-    const bool COLLISON_DETECTION_ON = true;
-    const bool FOOD_IS_DROPPING = true;
-    bool INVADERS_ARE_MOVING=true;
-    bool CIVILIANS_ARE_MOVING=true; 
-    bool charactersCanEat = true;
-    int secsBetweenDrops = 5;
-    vec3 foodColor = vec3(184/255.0,139/255.0,94/255.0);
-    int CIVILIANS_MAX_HEALTH = 1000;
-    int INVADERS_MAX_HEALTH = 1000;
-    bool CIVILIANS_ARE_STARVING = true;
-    bool INVADERS_ARE_STARVING =true;
+      // GAME ATTRIBUTES
+        const bool COLLISON_DETECTION_ON = true;
+        bool charactersCanEat = true;
 
-    int CIVILIAN_HUNGER_INTERVAL = 2; 
-    int CIVILIAN_HEALTH_LOSS = 50; 
-    int INVADER_HUNGER_INTERVAL = 2;
-    int INVADER_HEATH_LOSS = 50;
+
+   
   //
 //
 
@@ -600,10 +604,7 @@ void buffersetup(){
 }
 
 void setupmap(){
-  
   const vec3 BAD_GUY_COLOR= vec3 (1.0,0.0,0.0);
-  const vec3 CANNOT_SELECT = vec3 (0.0,0.0,0.0);
-  const vec3 TREE_COLOR = vec3(0.0,1.0,0.0);
   
   srand(time(NULL));// seed the random function with time
   
