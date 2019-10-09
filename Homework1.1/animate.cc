@@ -171,6 +171,7 @@ class Food : public Square{
   void processSelection(unsigned char PixelColor[], int btn);
   vec3 nextselectioncolor();
   string current_title();
+  bool is_game_over();
 //
 
 //Character Movement Functions
@@ -178,6 +179,7 @@ class Food : public Square{
   bool can_move_down(Square character,int amount);
   bool can_move_left(Square character,int amount);
   bool can_move_right(Square character,int amount);
+  bool can_spawn_there(Food object);
   //Idle animations
     void move_invaders_randomly(int amount);
     void move_invaders_toward_food(int amount);
@@ -186,7 +188,7 @@ class Food : public Square{
     void spawn_food(int extrasize);
     void characters_eat();
     void slowly_starve_characters();
-  bool character_will_hit_tree(Square character,Square tree,
+  bool objects_will_collide(Square character,Square tree,
   int amountup , int amountdown ,int amountleft, int amountright);
   bool character_did_get_food(Square *character, Square *food);
   
@@ -209,6 +211,9 @@ class Food : public Square{
 
 //Global Variables 
   bool clearscreen=true;
+  bool gameStarted = false;
+  bool gameOver = false;
+  bool civiliansWin = false;
   // Character and object vectors ////////////
     vector<Civilian*> civilians;
     vector<Invader*> invaders;
@@ -232,12 +237,13 @@ class Food : public Square{
     Stopwatch foodtimer;
     Stopwatch civilanstarver;
     Stopwatch invaderstarver;
+    Stopwatch gametimer;
   // Custom Game Variables Setup 
     //cammelCase - can be canged while game is running
     //THIS_NOTATION - cannot be changed so must be set before starting
     //Some may be easy to make editable.
       // TREE ATTRIBUTES
-        const int treeSize = 40; 
+        const int INITIAL_TREE_SIZE = 80; 
         const vec3 treeColor = vec3(50/255.0,77/255.0,43/255.0);
         const int NUM_TREES = 6;
 
@@ -248,13 +254,13 @@ class Food : public Square{
         bool invadersAreMoving=true;
         int INVADERS_MAX_HEALTH = 1000;
         int invaderHungerInterval = 2; //sec 
-        int invaderHealthlossperinterval = 25; 
+        int invaderHealthlossperinterval = 100; 
         bool invadersAreStarving =true;
       // CIVILIANS ATTRIBUTES
         const int INITIAL_CHARACTER_SIZE = 20;
         const int NUM_GOOD_GUYS = 5;
-        const int civiliansStepSize = 20;
-        const GLfloat civiliansSpeed = 0.09;
+        const int civiliansStepSize = 10;
+        const GLfloat civiliansSpeed = 0.40;
         bool civiliansAreMoving=true; 
         int CIVILIANS_MAX_HEALTH = 1000;
         bool civiliansAreStarving = true;
@@ -279,58 +285,59 @@ extern "C" void display(){
   if (clearscreen) {
     glClear(GL_COLOR_BUFFER_BIT);
   }
-  
-  //Draw all the characters
-  for (auto character : civilians){
-    if(character->is_alive()){
-      character->draw();
+  if(gameStarted){
+    //Draw all the characters
+    for (auto character : civilians){
+      if(character->is_alive()){
+        character->draw();
+      }
     }
-  }
-  for(auto character : invaders){
-    if(character->is_alive()){
-      character->draw();
+    for(auto character : invaders){
+      if(character->is_alive()){
+        character->draw();
+      }
     }
-  }
-  for(auto object : trees){
-    object->draw();
-  }
-  for (auto object : food){
-    if(!object->has_been_eaten()){
-    object->draw();
+    for(auto object : trees){
+      object->draw();
     }
-  }
+    for (auto object : food){
+      if(!object->has_been_eaten()){
+      object->draw();
+      }
+    }
 
-  glutSwapBuffers ();
+    glutSwapBuffers ();
+  }
 }
 
 extern "C" void idle(){  
-
   glutSetWindowTitle(current_title().c_str());
-
-  if (invadersAreMoving) {
-    switch(rand()%2){
-      case(0):
-        move_invaders_randomly(invadersStepSize); 
-      if(rand() % 2==0) break;
-      
-      case(1):
-        move_invaders_toward_food(invadersStepSize);
-      break;    
+  
+  if(!is_game_over()){
+    if (invadersAreMoving) {
+      switch(rand()%2){
+        case(0):
+          move_invaders_randomly(invadersStepSize); 
+        if(rand() % 2==0) break;
+        
+        case(1):
+          move_invaders_toward_food(invadersStepSize);
+        break;    
+      }
+    }
+    if(civiliansAreMoving){
+      move_civilians();
+    }
+    if(foodIsDropping){
+      drop_food();
+    }
+    if(charactersCanEat){
+      characters_eat();
+    }
+    if (civiliansAreStarving || invadersAreStarving){
+      slowly_starve_characters();
     }
   }
-  if(civiliansAreMoving){
-    move_civilians();
-  }
-  if(foodIsDropping){
-    drop_food();
-  }
-  if(charactersCanEat){
-    characters_eat();
-  }
-  if (civiliansAreStarving || invadersAreStarving){
-    slowly_starve_characters();
-  }
-  
   glutPostRedisplay();
 }
 
@@ -477,6 +484,9 @@ extern "C" void key(unsigned char k, int xx, int yy){
     break;
   case 'c':
     clearscreen = !clearscreen;
+  case 'b':
+  case 'B': 
+    gameStarted = true;
   }
 
 
@@ -518,9 +528,9 @@ extern "C" void key(unsigned char k, int xx, int yy){
 extern "C" void special(int k, int xx, int yy){
   switch (k) {
   case GLUT_KEY_UP:
-    break;
+  break;
   case GLUT_KEY_DOWN:
-    break;
+  break;
   case GLUT_KEY_LEFT:
     break;
   case GLUT_KEY_RIGHT:
@@ -624,12 +634,12 @@ void setupmap(){
 
   // set up trees
   for (int i=0; i<NUM_TREES; i++){
-    randomx = rand() %  (win_w - treeSize) + treeSize;
-    randomy = rand() %  (win_h - treeSize) + treeSize;
+    randomx = rand() %  (win_w - INITIAL_TREE_SIZE) + INITIAL_TREE_SIZE;
+    randomy = rand() %  (win_h - INITIAL_TREE_SIZE) + INITIAL_TREE_SIZE;
     
     trees.push_back(new Square(0,points,offsetLoc,sizeLoc,colorLoc));
-    trees[i]->change_size(INITIAL_CHARACTER_SIZE);
-    trees[i]->move(randomx,randomy-INITIAL_CHARACTER_SIZE);
+    trees[i]->change_size(INITIAL_TREE_SIZE);
+    trees[i]->move(randomx,randomy);
     trees[i]->color(treeColor);
     trees[i]->selectColor(nextselectioncolor());
   }
@@ -662,6 +672,7 @@ void setupmap(){
       randomx = rand() %  (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE;
       randomy = rand() % win_h/3 + win_h/2 ;// spawn bad characters in the top half
       potential_invader->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
+      potential_invader->change_size(INITIAL_CHARACTER_SIZE);
       potential_invader->goal_to_pos(); 
     }while (!(
     can_move_left(*potential_invader,0) &&
@@ -704,7 +715,7 @@ bool can_move_up(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(character_will_hit_tree(character,*tree,amount,0,0,0)){return false;}
+      if(objects_will_collide(character,*tree,amount,0,0,0)){return false;}
     }
   }
   return true; 
@@ -716,7 +727,7 @@ bool can_move_down(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(character_will_hit_tree(character,*tree,0,amount,0,0)){return false;}
+      if(objects_will_collide(character,*tree,0,amount,0,0)){return false;}
     }
   }
   return true;
@@ -727,7 +738,7 @@ bool can_move_left(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(character_will_hit_tree(character,*tree,0,0,amount,0)){return false;}
+      if(objects_will_collide(character,*tree,0,0,amount,0)){return false;}
     }
   }
   return true;
@@ -738,7 +749,7 @@ bool can_move_right(Square character,int amount){
       return false;
     }
     for (auto tree : trees){
-      if(character_will_hit_tree(character,*tree,0,0,0,amount)){return false;}
+      if(objects_will_collide(character,*tree,0,0,0,amount)){return false;}
     }
   }
   return true;
@@ -748,29 +759,31 @@ bool can_move_right(Square character,int amount){
 void move_invaders_randomly(int amount){
    srand(time(NULL)); 
     for(auto character: invaders){
-      character->goal_to_pos();
-      switch(rand()%4){
-        case 0:
-          if(can_move_up(*character,amount)){
-            character->move_up(amount);
-          }
-          break;
-        case 1:
-          if(can_move_left(*character,amount)){
-            character->move_left(amount);
-          }
-          break;
-        case 2:
-          if(can_move_down(*character,amount)){
-            character->move_down(amount);
-          }
-        case 3:
-          if(can_move_right(*character,amount)){
-            character->move_right(amount);
-          }
-          break;
-      }
-      character->update();
+      if(character->is_alive()){
+        character->goal_to_pos();
+        switch(rand()%4){
+          case 0:
+            if(can_move_up(*character,amount)){
+              character->move_up(amount);
+            }
+            break;
+          case 1:
+            if(can_move_left(*character,amount)){
+              character->move_left(amount);
+            }
+            break;
+          case 2:
+            if(can_move_down(*character,amount)){
+              character->move_down(amount);
+            }
+          case 3:
+            if(can_move_right(*character,amount)){
+              character->move_right(amount);
+            }
+            break;
+        }
+        character->update();
+    }
     }
 }
 
@@ -786,33 +799,35 @@ int food_lenth_from_character(Character* c,Food* f){
 
 void move_invaders_toward_food(int amount){
     for(auto character: invaders){
-      int min_distance_from_food = 100000000;
-      vec2 closest_food_coordinates = vec2(0,0);
-      for (auto object : food){
-        if(min_distance_from_food < food_lenth_from_character(character,object));
-        closest_food_coordinates = object->get_pos();
-      }
+      if(character->is_alive()){
+        int min_distance_from_food = 100000000;
+        vec2 closest_food_coordinates = vec2(0,0);
+        for (auto object : food){
+          if(min_distance_from_food < food_lenth_from_character(character,object));
+          closest_food_coordinates = object->get_pos();
+        }
 
-      bool needToGoRight = character->get_pos().x < closest_food_coordinates.x;
-      bool needToGoUp = character->get_pos().y < closest_food_coordinates.y;
-      
-      switch (rand()%2){
-        case 0:
-          if(needToGoUp && can_move_up(*character,amount)){
-            character->move_up(amount);
-          }else if(can_move_down(*character,amount)){
-            character->move_down(amount);
-          }
-        if(rand() % 2 == 0){break;}       
+        bool needToGoRight = character->get_pos().x < closest_food_coordinates.x;
+        bool needToGoUp = character->get_pos().y < closest_food_coordinates.y;
         
-        case 1: 
-          if(needToGoRight && can_move_right(*character,amount)){
-            character->move_right(amount);
-          }else if(can_move_left(*character,amount)){
-            character->move_left(amount);
-          }
-      } 
-    character->update();
+        switch (rand()%2){
+          case 0:
+            if(needToGoUp && can_move_up(*character,amount)){
+              character->move_up(amount);
+            }else if(can_move_down(*character,amount)){
+              character->move_down(amount);
+            }
+          if(rand() % 2 == 0){break;}       
+          
+          case 1: 
+            if(needToGoRight && can_move_right(*character,amount)){
+              character->move_right(amount);
+            }else if(can_move_left(*character,amount)){
+              character->move_left(amount);
+            }
+        } 
+      character->update();
+    }
   }
 }
 
@@ -824,7 +839,7 @@ void move_civilians(){
   }
 }
 
-bool character_will_hit_tree(Square character,Square tree,
+bool objects_will_collide(Square character,Square tree,
 int amountup,int amountdown,int amountleft,int amountright){ 
     GLfloat tree_x = tree.get_pos().x;
     GLfloat tree_y = tree.get_pos().y;
@@ -883,15 +898,22 @@ void spawn_food(int size){
     srand(time(NULL));
   }
 
+  Food* potential_food = new Food(0,points,offsetLoc,sizeLoc,colorLoc);
+  potential_food->color(foodColor);
+  potential_food->change_size(INITIAL_FOOD_SIZE + size);
+  potential_food->selectColor(nextselectioncolor());
+
+  do {
   int randomx = rand() % (win_w - INITIAL_FOOD_SIZE - size) + INITIAL_FOOD_SIZE + size;
   int randomy = rand() % (win_h - INITIAL_FOOD_SIZE - size) + INITIAL_FOOD_SIZE + size;
+  
+  potential_food->move(randomx,randomy+INITIAL_FOOD_SIZE);
+  potential_food->goal_to_pos();
 
-  food.push_back(new Food(0,points,offsetLoc,sizeLoc,colorLoc));
-  food[food.size()-1]->color(foodColor);
-  food[food.size()-1]->change_size(INITIAL_FOOD_SIZE + size);
-  food[food.size()-1]->move(randomx,randomy+INITIAL_FOOD_SIZE);
-  food[food.size()-1]->goal_to_pos();
-  food[food.size()-1]->selectColor(nextselectioncolor());
+  }while(!can_spawn_there(*potential_food));
+
+  food.push_back(potential_food);
+
 }
 
 
@@ -960,10 +982,64 @@ void slowly_starve_characters(){
 
 }
 
-string current_title(){
-  return "this is the new title";
+bool can_spawn_there(Food food){
+ for(auto character : civilians){
+  if(character->is_alive()){
+    if(objects_will_collide(*character,food,10,10,10,10)){ return false;}
+  }
+ }
+ for(auto character : invaders){
+  if(character->is_alive()){
+    if(objects_will_collide(*character,food,10,10,10,10)){ return false;}
+  }
+ }
+ for(auto object : trees){
+  if(objects_will_collide(*object,food,0,0,0,0)){return false;}
+ }
+ return true;
 }
 
+string current_title(){
+  
+  if(!gameStarted){
+    return("Use:AWSD keys to move|Select character to move with mouse|Press b to start");
+  }
+  if(!gameOver){
+    return ("You will be Green and starve to red  PlayTime: " + std::to_string(gametimer.get_time()));
+  }else{
+    static int winning_time = gametimer.get_time();
+    if(civiliansWin){
+      return("You won in " + std::to_string(winning_time)  + " Seconds");
+    }else{
+      return("You lost in " + std::to_string(winning_time) + " Seconds" );
+    }
+    
+    
+  }
+
+
+}
+bool is_game_over(){
+  int living_invaders=0;
+  int living_civilians=0;
+  for(auto character : invaders){
+    if (character->is_alive()){
+      civiliansWin = false;
+      living_invaders++;
+    }
+  }
+ for(auto character : civilians){
+    if (character->is_alive()){
+      civiliansWin = true;
+      living_civilians++;
+    }
+  }
+  if(living_civilians == 0 || living_invaders == 0){
+    gameOver=true;
+  }
+
+  return gameOver;
+}
 
 int main(int argc, char** argv){
   // Several people forgot to put in the following line.  This is an
@@ -975,6 +1051,9 @@ int main(int argc, char** argv){
   // Initialize the "magic" that glues all the code together.
   glewInit();
 
+  gametimer.reset();
+
+  
   buffersetup();   // set up shaders and display environment
 
   glutMainLoop();       // enter event loop
