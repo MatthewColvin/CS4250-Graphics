@@ -10,11 +10,13 @@
 #include <vector>
 #include <random>
 #include <time.h>
+#include <string>
 
 using std::cin;
 using std::cout;
 using std::endl;
 using std::vector;
+using std::string;
 
 class Stopwatch{
   public:
@@ -168,7 +170,7 @@ class Food : public Square{
   void setupmap();
   void processSelection(unsigned char PixelColor[], int btn);
   vec3 nextselectioncolor();
-
+  string current_title();
 //
 
 //Character Movement Functions
@@ -177,7 +179,8 @@ class Food : public Square{
   bool can_move_left(Square character,int amount);
   bool can_move_right(Square character,int amount);
   //Idle animations
-    void move_invaders(int amount);
+    void move_invaders_randomly(int amount);
+    void move_invaders_toward_food(int amount);
     void move_civilians();
     void drop_food();
     void spawn_food(int extrasize);
@@ -234,42 +237,40 @@ class Food : public Square{
     //THIS_NOTATION - cannot be changed so must be set before starting
     //Some may be easy to make editable.
       // TREE ATTRIBUTES
-        const int INITIAL_TREE_SIZE = 40; 
-        const vec3 TREE_COLOR = vec3(50/255.0,77/255.0,43/255.0);
+        const int treeSize = 40; 
+        const vec3 treeColor = vec3(50/255.0,77/255.0,43/255.0);
         const int NUM_TREES = 6;
 
       // INVADER ATTRIBUTES
-        const int NUM_BAD_GUYS = 5;
-        const int INVADERS_STEP_SIZE = 1;
-        const GLfloat INVADERS_SPEED = 0.09;
-        bool INVADERS_ARE_MOVING=true;
+        int NUM_BAD_GUYS = 5;
+        int invadersStepSize = 1;
+        GLfloat invadersSpeed = 0.09;
+        bool invadersAreMoving=true;
         int INVADERS_MAX_HEALTH = 1000;
-        int INVADER_HUNGER_INTERVAL = 2;
-        int INVADER_HEATH_LOSS = 25;
-        bool INVADERS_ARE_STARVING =true;
+        int invaderHungerInterval = 2; //sec 
+        int invaderHealthlossperinterval = 25; 
+        bool invadersAreStarving =true;
       // CIVILIANS ATTRIBUTES
         const int INITIAL_CHARACTER_SIZE = 20;
-        const int NUM_GOOD_GUYS = 2;
-        const int CIVILIANS_STEP_SIZE = 10;
-        const GLfloat CIVILIANS_SPEED = 0.09;
-        bool CIVILIANS_ARE_MOVING=true; 
+        const int NUM_GOOD_GUYS = 5;
+        const int civiliansStepSize = 20;
+        const GLfloat civiliansSpeed = 0.09;
+        bool civiliansAreMoving=true; 
         int CIVILIANS_MAX_HEALTH = 1000;
-        bool CIVILIANS_ARE_STARVING = true;
-        int CIVILIAN_HUNGER_INTERVAL = 2; 
-        int CIVILIAN_HEALTH_LOSS = 100; 
+        bool civiliansAreStarving = true;
+        int civilianHungerInterval = 2; //sec
+        int civilianHealthLossPerInterval = 100; 
 
       // FOOD ATTRIBUTES
-        const int INITIAL_FOOD_SIZE = 5;
-        const bool FOOD_IS_DROPPING = true;
+        int INITIAL_FOOD_SIZE = 5;
+        bool foodIsDropping = true;
         int secsBetweenDrops = 5;
         vec3 foodColor = vec3(184/255.0,139/255.0,94/255.0);
 
       // GAME ATTRIBUTES
-        const bool COLLISON_DETECTION_ON = true;
+        const bool collisonDetectionIsOn = true;
         bool charactersCanEat = true;
 
-
-   
   //
 //
 
@@ -302,20 +303,31 @@ extern "C" void display(){
   glutSwapBuffers ();
 }
 
-extern "C" void idle(){
-  if (INVADERS_ARE_MOVING) {
-    move_invaders(INVADERS_STEP_SIZE); 
+extern "C" void idle(){  
+
+  glutSetWindowTitle(current_title().c_str());
+
+  if (invadersAreMoving) {
+    switch(rand()%2){
+      case(0):
+        move_invaders_randomly(invadersStepSize); 
+      if(rand() % 2==0) break;
+      
+      case(1):
+        move_invaders_toward_food(invadersStepSize);
+      break;    
+    }
   }
-  if(CIVILIANS_ARE_MOVING){
+  if(civiliansAreMoving){
     move_civilians();
   }
-  if(FOOD_IS_DROPPING){
+  if(foodIsDropping){
     drop_food();
   }
   if(charactersCanEat){
     characters_eat();
   }
-  if (CIVILIANS_ARE_STARVING || INVADERS_ARE_STARVING){
+  if (civiliansAreStarving || invadersAreStarving){
     slowly_starve_characters();
   }
   
@@ -429,7 +441,7 @@ extern "C" void myReshape(int w, int h){
 extern "C" void myMenu(int value){
   switch (value) {
   case 1:
-    INVADERS_ARE_MOVING = !INVADERS_ARE_MOVING; // switch 
+    invadersAreMoving = !invadersAreMoving; // switch 
     break;
   case 2: // Black background
     glClearColor (0.0, 0.0, 0.0, 1.0);
@@ -445,7 +457,7 @@ extern "C" void myMenu(int value){
 // Create menu and items.
 void setupMenu(){
   glutCreateMenu(myMenu);
-  if(INVADERS_ARE_MOVING){
+  if(invadersAreMoving){
     glutAddMenuEntry("Stop Enemies", 1);
   }else{
     glutAddMenuEntry("Start Enemies",1);
@@ -475,23 +487,23 @@ extern "C" void key(unsigned char k, int xx, int yy){
       character->goal_to_pos(); 
       switch (k){
       case 'w':
-        if(can_move_up(*character,CIVILIANS_STEP_SIZE)){
-          character->move_up(CIVILIANS_STEP_SIZE);
+        if(can_move_up(*character,civiliansStepSize)){
+          character->move_up(civiliansStepSize);
         }
         break;
       case 'a':
-        if(can_move_left(*character,CIVILIANS_STEP_SIZE)){
-          character->move_left(CIVILIANS_STEP_SIZE);
+        if(can_move_left(*character,civiliansStepSize)){
+          character->move_left(civiliansStepSize);
         }
         break;
       case 's':
-        if(can_move_down(*character,CIVILIANS_STEP_SIZE)){
-          character->move_down(CIVILIANS_STEP_SIZE);
+        if(can_move_down(*character,civiliansStepSize)){
+          character->move_down(civiliansStepSize);
         }
         break;
       case 'd':
-        if(can_move_right(*character,CIVILIANS_STEP_SIZE)){
-          character->move_right(CIVILIANS_STEP_SIZE);
+        if(can_move_right(*character,civiliansStepSize)){
+          character->move_right(civiliansStepSize);
         }
         break;
       }
@@ -609,43 +621,56 @@ void setupmap(){
   srand(time(NULL));// seed the random function with time
   
   GLfloat randomx, randomy;
-  //set up the good characters 
-  for (int i=0; i<NUM_GOOD_GUYS; i++){
-    randomx = rand() % (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE ;
-    randomy = rand() % win_h/3; //spawn good guys in the bottom half
-    
-    civilians.push_back(new Civilian(0,points,offsetLoc,sizeLoc,colorLoc,CIVILIANS_MAX_HEALTH));
-    civilians[i]->change_size(INITIAL_CHARACTER_SIZE);
-    civilians[i]->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
-    civilians[i]->goal_to_pos(); 
-    civilians[i]->setSpeed(CIVILIANS_SPEED);
-    civilians[i]->selectColor(nextselectioncolor());
-  }
-  //set up the bad characters
-  for (int i=0; i<NUM_BAD_GUYS; i++){
-    randomx = rand() %  (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE;
-    randomy = rand() % win_h/3 + win_h/2 ;// spawn bad characters in the top half
-    
-    invaders.push_back(new Invader(0,points,offsetLoc,sizeLoc,colorLoc,INVADERS_MAX_HEALTH));
-    invaders[i]->change_size(INITIAL_CHARACTER_SIZE);
-    invaders[i]->move(randomx,randomy-INITIAL_CHARACTER_SIZE);
-    invaders[i]->color(BAD_GUY_COLOR);
-    invaders[i]->setSpeed(INVADERS_SPEED);
-    invaders[i]->selectColor(nextselectioncolor());
-  }
+
   // set up trees
   for (int i=0; i<NUM_TREES; i++){
-    randomx = rand() %  (win_w - INITIAL_TREE_SIZE) + INITIAL_TREE_SIZE;
-    randomy = rand() %  (win_h - INITIAL_TREE_SIZE) + INITIAL_TREE_SIZE;
+    randomx = rand() %  (win_w - treeSize) + treeSize;
+    randomy = rand() %  (win_h - treeSize) + treeSize;
     
     trees.push_back(new Square(0,points,offsetLoc,sizeLoc,colorLoc));
     trees[i]->change_size(INITIAL_CHARACTER_SIZE);
     trees[i]->move(randomx,randomy-INITIAL_CHARACTER_SIZE);
-    trees[i]->color(TREE_COLOR);
+    trees[i]->color(treeColor);
     trees[i]->selectColor(nextselectioncolor());
   }
 
-
+  //set up the good characters 
+  for (int i=0; i<NUM_GOOD_GUYS; i++){
+    Civilian* potential_citizen = new Civilian(0,points,offsetLoc,sizeLoc,colorLoc,CIVILIANS_MAX_HEALTH);
+    potential_citizen->change_size(INITIAL_CHARACTER_SIZE);
+    potential_citizen->selectColor(nextselectioncolor());
+    potential_citizen->setSpeed(civiliansSpeed);
+    
+    do{
+      randomx = rand() % (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE ;
+      randomy = rand() % win_h/3; //spawn good guys in the bottom half
+      potential_citizen->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
+      potential_citizen->goal_to_pos(); 
+    }while (!(
+    can_move_left(*potential_citizen,0) &&
+    can_move_right(*potential_citizen,0) &&
+    can_move_up(*potential_citizen,0) &&
+    can_move_down(*potential_citizen,0)
+    ));
+     
+    civilians.push_back(potential_citizen);
+  }
+  //set up the bad characters
+  for (int i=0; i<NUM_BAD_GUYS; i++){
+  Invader* potential_invader = new Invader(0,points,offsetLoc,sizeLoc,colorLoc,CIVILIANS_MAX_HEALTH);
+  do{
+      randomx = rand() %  (win_w - INITIAL_CHARACTER_SIZE) + INITIAL_CHARACTER_SIZE;
+      randomy = rand() % win_h/3 + win_h/2 ;// spawn bad characters in the top half
+      potential_invader->move(randomx,randomy+INITIAL_CHARACTER_SIZE);
+      potential_invader->goal_to_pos(); 
+    }while (!(
+    can_move_left(*potential_invader,0) &&
+    can_move_right(*potential_invader,0) &&
+    can_move_up(*potential_invader,0) &&
+    can_move_down(*potential_invader,0)
+    ));
+    invaders.push_back(potential_invader);
+  }
 }
 
 
@@ -674,7 +699,7 @@ vec3 nextselectioncolor(){
 
 //function to determine characters ability to move upward a given amount
 bool can_move_up(Square character,int amount){
-  if(COLLISON_DETECTION_ON){
+  if(collisonDetectionIsOn){
     if (character.get_pos().y >= win_h - character.get_size() - amount ){ // character is at edge of window
       return false;
     }
@@ -686,7 +711,7 @@ bool can_move_up(Square character,int amount){
 }
 //function to determine characters ability to move downward a given amount
 bool can_move_down(Square character,int amount){
-  if(COLLISON_DETECTION_ON){
+  if(collisonDetectionIsOn){
     if (character.get_pos().y <= 0 + character.get_size() + amount ){// character is at edge of window
       return false;
     }
@@ -697,7 +722,7 @@ bool can_move_down(Square character,int amount){
   return true;
 }
 bool can_move_left(Square character,int amount){
-  if(COLLISON_DETECTION_ON){  
+  if(collisonDetectionIsOn){  
     if( character.get_pos().x <= 0 + character.get_size() + amount ){// character is at edge of window
       return false;
     }
@@ -708,7 +733,7 @@ bool can_move_left(Square character,int amount){
   return true;
 }
 bool can_move_right(Square character,int amount){
-  if(COLLISON_DETECTION_ON){
+  if(collisonDetectionIsOn){
     if(character.get_pos().x >= win_w - character.get_size() - amount ){// character is at edge of window
       return false;
     }
@@ -720,7 +745,7 @@ bool can_move_right(Square character,int amount){
 }
 
 //moves invaders randomly TODO make them struggle toward the food 
-void move_invaders(int amount){
+void move_invaders_randomly(int amount){
    srand(time(NULL)); 
     for(auto character: invaders){
       character->goal_to_pos();
@@ -748,6 +773,50 @@ void move_invaders(int amount){
       character->update();
     }
 }
+
+
+int food_lenth_from_character(Character* c,Food* f){  
+  if(c->is_alive() && !f->has_been_eaten()){
+    vec2 foodpos = f->get_pos();
+    vec2 charpos = c->get_pos();
+    return(sqrt((foodpos.x-charpos.x)*(foodpos.x-charpos.x) + (foodpos.y-charpos.y)*(foodpos.y-charpos.y)));
+  }
+  return -1;
+}
+
+void move_invaders_toward_food(int amount){
+    for(auto character: invaders){
+      int min_distance_from_food = 100000000;
+      vec2 closest_food_coordinates = vec2(0,0);
+      for (auto object : food){
+        if(min_distance_from_food < food_lenth_from_character(character,object));
+        closest_food_coordinates = object->get_pos();
+      }
+
+      bool needToGoRight = character->get_pos().x < closest_food_coordinates.x;
+      bool needToGoUp = character->get_pos().y < closest_food_coordinates.y;
+      
+      switch (rand()%2){
+        case 0:
+          if(needToGoUp && can_move_up(*character,amount)){
+            character->move_up(amount);
+          }else if(can_move_down(*character,amount)){
+            character->move_down(amount);
+          }
+        if(rand() % 2 == 0){break;}       
+        
+        case 1: 
+          if(needToGoRight && can_move_right(*character,amount)){
+            character->move_right(amount);
+          }else if(can_move_left(*character,amount)){
+            character->move_left(amount);
+          }
+      } 
+    character->update();
+  }
+}
+
+
 
 void move_civilians(){
   for (auto character : civilians){
@@ -852,8 +921,14 @@ bool character_did_get_food(Square* character, Square* food){
 }
 
 void characters_eat(){
-  for (auto character:civilians){
-    for(auto object: food){
+  for(auto object: food){
+    for (auto character : civilians){
+      if(character_did_get_food(character,object)){
+        character->add_heath((int)(object->get_size())); // character gets as much heath as food size 
+        object->eat();
+      }
+    }
+    for (auto character : invaders){
       if(character_did_get_food(character,object)){
         character->add_heath((int)(object->get_size())); // character gets as much heath as food size 
         object->eat();
@@ -864,25 +939,29 @@ void characters_eat(){
 
 void slowly_starve_characters(){
   
-  if(INVADERS_ARE_STARVING && invaderstarver.get_time() > INVADER_HUNGER_INTERVAL){
+  if(invadersAreStarving && invaderstarver.get_time() > invaderHungerInterval){
     for (auto character : invaders){
       if(character->is_alive()){
-        character->sub_health(INVADER_HEATH_LOSS);
+        character->sub_health(invaderHealthlossperinterval);
       }
     }
   invaderstarver.reset();  
   }
 
-  if(CIVILIANS_ARE_STARVING && civilanstarver.get_time() > CIVILIAN_HUNGER_INTERVAL){
+  if(civiliansAreStarving && civilanstarver.get_time() > civilianHungerInterval){
     for (auto character : civilians){
       if(character->is_alive()){
-        character->sub_health(CIVILIAN_HEALTH_LOSS);
+        character->sub_health(civilianHealthLossPerInterval);
       }
     }
   civilanstarver.reset();  
   }
 
 
+}
+
+string current_title(){
+  return "this is the new title";
 }
 
 
