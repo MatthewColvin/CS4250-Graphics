@@ -1,5 +1,3 @@
-#include "character.h"
-#include "vertex.h"
 #include "Angel.h"
 
 void windowsetup();
@@ -16,31 +14,16 @@ void reshape(int newwidth,int newheight);
     int windowHeight;
     GLuint ShaderProgramID;
 
-    Character* dog;
-
-
 
 int main(int argc, char** argv) {
     glutInit(&argc,argv);  // start Glut
     windowsetup();
     glewInit();
     setupglutcallbacks();
-    setupcharacter();
-    setupshaders();
-    
 
     glutMainLoop();
 }
 
-
-void setupcharacter(){
-    dog = new Character(50,50,vec4(0.0,0.0,1.0,1.0));
-}
-
-
-void setupshaders(){
-    GLuint ShaderProgramID = InitShader("source/vshader.glsl", "source/fshader.glsl");
-}
 
 
 void setupglutcallbacks(){
@@ -50,12 +33,10 @@ void setupglutcallbacks(){
 
 void display(){
     glClear(GL_COLOR_BUFFER_BIT);
-    glLoadIdentity();
     //Draw stuff here
-    
-    dog->Draw();
-    
-    glFlush();
+   
+
+    glutSwapBuffers();
 }
 
 void reshape(int w,int h){
@@ -70,10 +51,9 @@ void reshape(int w,int h){
 void windowsetup(){
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE); // RGB and double buffering in glut
     glutInitWindowPosition(200,200);
-    glutInitWindowSize(500,500);
+    glutInitWindowSize(1000,1000);
     glutCreateWindow("Homework1");
 
     glClearColor(0.0, 0.0, 0.0, 1.0); // set background color to black
-
 }
 

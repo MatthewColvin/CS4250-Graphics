@@ -5,7 +5,7 @@ varying vec4 fcolor;
 uniform ivec2 offset;
 uniform float size;
 uniform vec2 windowSize;
-uniform vec4 vcolor;
+attribute vec4 vcolor;
 
 void main() 
 {
