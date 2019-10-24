@@ -248,7 +248,7 @@ class Food : public Square{
         const int NUM_TREES = 6;
 
       // INVADER ATTRIBUTES
-        int NUM_BAD_GUYS = 5;
+        int NUM_BAD_GUYS = 50;
         int invadersStepSize = 1;
         GLfloat invadersSpeed = 0.09;
         bool invadersAreMoving=true;
@@ -258,7 +258,7 @@ class Food : public Square{
         bool invadersAreStarving =true;
       // CIVILIANS ATTRIBUTES
         const int INITIAL_CHARACTER_SIZE = 20;
-        const int NUM_GOOD_GUYS = 5;
+        const int NUM_GOOD_GUYS = 50;
         const int civiliansStepSize = 10;
         const GLfloat civiliansSpeed = 0.40;
         bool civiliansAreMoving=true; 
