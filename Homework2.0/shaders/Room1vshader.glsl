@@ -9,9 +9,9 @@ attribute vec4 vcolor;
 
 void main() 
 {
-  gl_Position.x=(2.0*(size*(vPosition.x)+float(offset.x)))/windowSize.x-1.0;
-  gl_Position.y=(2.0*(size*(vPosition.y)+float(offset.y)))/windowSize.y-1.0;
-  gl_Position.z=0.0;
+  gl_Position.x = vPosition.x / windowSize.x;
+  gl_Position.y = vPosition.y / windowSize.y;
+  gl_Position.z = vPosition.z;
   gl_Position.w=1.0;
 
   fcolor = vcolor;

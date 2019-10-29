@@ -14,11 +14,22 @@ include /home/mcolvin/Documents/CS4250-Grapics/code-egs/Makefile.defs
 # with no arguments. 
 # animate is the executable to be created.
 
-InitHeaders = "-I/home/mcolvin/Documents/CS4250-Grapics/Homework1/headers"
+
+srcpth = /home/mcolvin/Documents/CS4250-Grapics/Homework2.0/source
+headerpth = /home/mcolvin/Documents/CS4250-Grapics/Homework2.0/headers
+InitHeaders = -I$(headerpth)
 
 
-homework: ./source/Homework1.cc 
-	$(CC) ./source/Homework1.cc  $(InitHeaders) $(InitShader) $(OPTIONS) $(LDLIBS) -o homework
+
+homework: $(srcpth)/Homework1.cc room.o
+	$(CC) $(srcpth)/Homework1.cc  $(InitHeaders) $(InitShader) room.o $(OPTIONS) $(LDLIBS) -o homework
+
+run: homework
+	./homework
+
+
+room.o: $(headerpth)/room.h $(srcpth)/room.cc
+	$(CC) $(srcpth)/room.cc  $(InitHeaders) -c $(OPTIONS)
 
 
 #texture.o: ./headers/texture.h ./source/texture.cc 
@@ -26,5 +37,5 @@ homework: ./source/Homework1.cc
 
 # clean up after yourself
 clean: 
-	rm -f animate homework square.o circle.o object.o
+	rm -f homework 
 	rm *.o -r
