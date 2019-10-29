@@ -5,9 +5,6 @@
     #include "ConfigVars.h"
 
 // Game Functions
-
-
-
 void windowsetup();
 void setupglutcallbacks();
 void setuproom();
