@@ -17,13 +17,15 @@
 
 #include <Angel.h>
 #include "common.h"
+#include <vector>
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
+using std::vector;
 
 const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
 
-point4 points[NumVertices];
-color4 colors[NumVertices];
+vector<point4> points(NumVertices);
+vector<color4> colors(NumVertices);
 
 // Vertices of a unit cube centered at origin, sides aligned with axes
 point4 vertices[8] = {
@@ -124,10 +126,27 @@ void init()
   GLuint buffer;
   glGenBuffers(1, &buffer);
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors),
-	       NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(points), points);
-  glBufferSubData(GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors);
+  
+  // Question : Why do you need to call BufferData with null before the subdata calls?
+  //          : Why does changing the code to use vectors mess with the interpliation and colors?
+  glBufferData(
+    GL_ARRAY_BUFFER, 
+    sizeof(points) * points.size() + sizeof(colors) * colors.size(),
+    NULL,
+    GL_STATIC_DRAW);
+
+  glBufferSubData(
+    GL_ARRAY_BUFFER,
+    0,
+    sizeof(points) * points.size() ,
+    &points.front());
+  
+  glBufferSubData(
+    GL_ARRAY_BUFFER, 
+    sizeof(points) * points.size() , 
+    sizeof(colors) * colors.size() , 
+    &colors.front());
+
 
   // Load shaders and use the resulting shader program
   GLuint program = InitShader("vshader41.glsl", "fshader41.glsl");
@@ -139,10 +158,15 @@ void init()
   glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0,
 			BUFFER_OFFSET(0));
 
+
+
   GLuint vColor = glGetAttribLocation(program, "vColor"); 
   glEnableVertexAttribArray(vColor);
   glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0,
 			BUFFER_OFFSET(sizeof(points)));
+
+
+
 
   model_view = glGetUniformLocation(program, "model_view");
   camera_view = glGetUniformLocation(program, "camera_view");
@@ -157,11 +181,23 @@ extern "C" void display()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  point4  eye(mvx+radius*sin(theta)*cos(phi),
-	      radius*sin(theta)*sin(phi),
-	      mvz+radius*cos(theta),
-	      1.0);
+
+  // radius 
+  // theta rotates about the y axis in the ???? coordinate system
+  // phi rotates about the ??? in the ??? coordinate system 
+  // cos 
+
+  point4  eye(
+        mvx   +   radius *  sin(theta) * cos(phi),
+	      
+        radius  *   sin(theta) *   sin(phi),
+	      
+        mvz   +   radius    *    cos(theta),
+	      
+        1.0);
   point4  at(mvx, 0.0, mvz, 1.0);
+
+  
   vec4    up(0.0, 1.0, 0.0, 0.0);
 
   mat4  cv = LookAt(eye, at, up);
@@ -169,6 +205,9 @@ extern "C" void display()
 
   mat4 mv = RotateZ(angle);
   glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
+
+  // zNear - controls the front clipping plane
+  // ZFar - controls the back clipping plane
 
   mat4  p = Perspective(fovy, aspect, zNear, zFar);
   glUniformMatrix4fv(projection, 1, GL_TRUE, p);

@@ -13,18 +13,31 @@ class Room{
         
         void draw();
 
-        void setwindowdimentions(int width,int height);
+        GLuint  camera_view;  // camera-view matrix uniform shader variable location
+        GLuint  model_view;  // model-view matrix uniform shader variable location
+        GLuint  projection; // projection matrix uniform shader variable location
+        GLuint  shaders;
 
     private:
-        //width and height of glut window        
-        int windowwidth;
-        int windowheight;
+        typedef Angel::vec4  color4;
+        typedef Angel::vec4  point4;
+
+        void init_points();
+        void MyQuad(int a, int b, int c, int d);
+        void colorcube();
+        inline int NumVertices(){return points.size();} 
 
 
-        GLuint shaderprogram;
+        color4 vertex_colors[8];
+        point4 vertices[8];
+
+        vector<point4> points;
+        vector<color4> colors;
+        
         GLuint VAO;
-        vector <GLuint> attributes;
-
-        //error handeling
-        bool ShadersSet= false;
+        // Attributes
+        //GLuint vPosition;
+        //GLuint vColor;
+        
+        
 };

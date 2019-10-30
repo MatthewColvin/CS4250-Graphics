@@ -1,8 +1,6 @@
-#include <Angel.h>
-#include "room.h"
-
-// Global Variables
-    #include "ConfigVars.h"
+#include "Config.h"
+typedef Angel::vec4  color4;
+typedef Angel::vec4  point4;
 
 // Game Functions
 void windowsetup();
@@ -12,9 +10,6 @@ void setuproom();
 //Callbacks for glut 
     void display();
     void reshape(int newwidth,int newheight);
-
-// global Variables 
-    Room* room1;
 
 
 int main(int argc, char** argv) {
@@ -27,10 +22,6 @@ int main(int argc, char** argv) {
     glutMainLoop();
 }
 
-void setuproom(){
-    room1 = new Room();
-}
-
 void setupglutcallbacks(){
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
@@ -39,14 +30,39 @@ void setupglutcallbacks(){
 void display(){
     glClear(GL_COLOR_BUFFER_BIT);
     //Draw stuff here
-   
+
+    point4  eye(
+        xeyeOffset   +   radius *  sin(theta) * cos(phi),
+	      
+        radius  *   sin(theta) *   sin(phi),
+	      
+        zeyeOffset   +   radius    *    cos(theta),
+	      
+        1.0);
+    
+    point4  at(xeyeOffset, 0.0, zeyeOffset, 1.0);
+
+    Angel::vec4 up(0.0, 1.0, 0.0, 0.0);
+
+    mat4  cv = LookAt(eye, at, up);
+
+    glUseProgram(room1->shaders);
+
+    glUniformMatrix4fv(room1->camera_view, 1, GL_TRUE, cv);
+
+    mat4 mv = RotateZ(angle);
+    glUniformMatrix4fv(room1->model_view, 1, GL_TRUE, mv);
+
+    mat4  p = Perspective(fovy, aspect, zNear, zFar);
+    glUniformMatrix4fv(room1->projection, 1, GL_TRUE, p);
+
+    room1->draw();
 
     glutSwapBuffers();
 }
 
 void reshape(int w,int h){
     glViewport(0,0,w,h);
-    room1->setwindowdimentions(w,h);
 }
 
 void setshaders(string vshader,string fshader){
@@ -63,3 +79,6 @@ void windowsetup(){
     glClearColor(0.0, 0.0, 0.0, 1.0); // set background color to black
 }
 
+void setuproom(){
+    room1 = new Room();
+}
