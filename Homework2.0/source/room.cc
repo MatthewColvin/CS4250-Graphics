@@ -53,7 +53,8 @@ Room::Room(){
   projection = glGetUniformLocation(shaders, "projection");
     
   glEnable(GL_DEPTH_TEST);
-  
+
+
   glBindVertexArray(0); // unbind vertex array object 
 }
 
@@ -93,15 +94,17 @@ void Room::init_points(){
 
 void Room::MyQuad(int a, int b, int c, int d)
 {
-  colors.push_back(vertex_colors[a]) ; points.push_back(vertices[a]); 
-  colors.push_back(vertex_colors[b]) ; points.push_back(vertices[b]); 
-  colors.push_back(vertex_colors[c]) ; points.push_back(vertices[c]); 
-  colors.push_back(vertex_colors[a]) ; points.push_back(vertices[a]); 
-  colors.push_back(vertex_colors[c]) ; points.push_back(vertices[c]); 
-  colors.push_back(vertex_colors[d]) ; points.push_back(vertices[d]); 
+  colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
+  colors[Index] = vertex_colors[b]; points[Index] = vertices[b]; Index++;
+  colors[Index] = vertex_colors[c]; points[Index] = vertices[c]; Index++;
+  colors[Index] = vertex_colors[a]; points[Index] = vertices[a]; Index++;
+  colors[Index] = vertex_colors[c]; points[Index] = vertices[c]; Index++;
+  colors[Index] = vertex_colors[d]; points[Index] = vertices[d]; Index++;
 }
 
 void Room::colorcube(){
+  points.resize(36);
+  colors.resize(36);
   MyQuad(1, 0, 3, 2);
   MyQuad(2, 3, 7, 6);
   MyQuad(3, 0, 4, 7);

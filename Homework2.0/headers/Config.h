@@ -22,11 +22,6 @@ GLuint shaderProgram = 0; // Shader Program ID
 Room *room1;
 
 
-
-
-
-
-
 // Viewing transformation parameters
 GLfloat radius = 3.0;
 GLfloat theta = 0.0;

@@ -1,86 +1,15 @@
-// Book code from Angel.
-//
-// Perspective view of a color cube using LookAt() and Perspective()
-//
-// Colors are assigned to each vertex and then the rasterizer interpolates
-//   those colors across the triangles.
-//
-// Modified by David Chelberg
-// last-modified: Fri Oct 28 14:06:29 2016
-// Added an animated rotation to the code.
-// Separated the transform for the camera (camera_view) from the
-//   object (model_view).
-// Added code to draw a "door"
-// Added code to draw a moving second cube (animated moving back and
-//   forth in a straight line).
-// Added code to account for elapsed time in the animations.
-
-#include <Angel.h>
-#include "common.h"
+#include "config.h" // has Angel included
 #include <vector>
-typedef Angel::vec4  color4;
-typedef Angel::vec4  point4;
+
 using std::vector;
 
-const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
+
+
+const int NumVertices = 36; 
 
 vector<point4> points(NumVertices);
 vector<color4> colors(NumVertices);
 
-// Vertices of a unit cube centered at origin, sides aligned with axes
-point4 vertices[8] = {
-    point4(-0.5, -0.5,  0.5, 1.0),
-    point4(-0.5,  0.5,  0.5, 1.0),
-    point4( 0.5,  0.5,  0.5, 1.0),
-    point4( 0.5, -0.5,  0.5, 1.0),
-    point4(-0.5, -0.5, -0.5, 1.0),
-    point4(-0.5,  0.5, -0.5, 1.0),
-    point4( 0.5,  0.5, -0.5, 1.0),
-    point4( 0.5, -0.5, -0.5, 1.0)
-};
-
-// RGBA olors
-color4 vertex_colors[8] = {
-    color4(0.0, 0.0, 0.0, 1.0),  // black
-    color4(1.0, 0.0, 0.0, 1.0),  // red
-    color4(1.0, 1.0, 0.0, 1.0),  // yellow
-    color4(0.0, 1.0, 0.0, 1.0),  // green
-    color4(0.0, 0.0, 1.0, 1.0),  // blue
-    color4(1.0, 0.0, 1.0, 1.0),  // magenta
-    color4(1.0, 1.0, 1.0, 1.0),  // white
-    color4(0.0, 1.0, 1.0, 1.0)   // cyan
-};
-
-// Viewing transformation parameters
-GLfloat radius = 3.0;
-GLfloat theta = 0.0;
-GLfloat phi = 0.0;
-
-const GLfloat  dr = 5.0 * DegreesToRadians;
-
-// Rotation of first cube
-bool rotatep;                  // whether to rotate or not
-GLfloat angle = 0.0;           // Angle of cube rotation.
-
-// Implementing a door that opens by swinging
-GLfloat doorAngle = 0.0;       // Angle of cube's door's rotation.
-GLfloat doorAngleIncr = 30.0;   // Amount to increment Angle of cube's
-			       // door's rotation.
-
-GLfloat trans = 0.0;   // trans of 2nd cube.
-GLfloat transinc = 1.0;// trans increment of 2nd cube.
-
-GLuint  camera_view;  // camera-view matrix uniform shader variable location
-GLuint  model_view;  // model-view matrix uniform shader variable location
-
-// Projection transformation parameters
-GLfloat  fovy = 45.0;  // Field-of-view in Y direction angle (in degrees)
-GLfloat  aspect;       // Viewport aspect ratio
-GLfloat  zNear = 0.5, zFar = 3.0;
-//GLfloat  zNear = 0.1;
-//GLfloat zFar = 300.0;
-
-GLuint  projection; // projection matrix uniform shader variable location
 
 // Global to keep track of what vertex we are setting.
 int Index = 0;
@@ -103,6 +32,7 @@ void MyQuad(int a, int b, int c, int d)
 // generate 12 triangles: 36 vertices and 36 colors
 void colorcube()
 {
+  
   MyQuad(1, 0, 3, 2);
   MyQuad(2, 3, 7, 6);
   MyQuad(3, 0, 4, 7);
@@ -133,23 +63,24 @@ void init()
     GL_ARRAY_BUFFER, 
     sizeof(points) * points.size() + sizeof(colors) * colors.size(),
     NULL,
-    GL_STATIC_DRAW);
-
+    GL_STATIC_DRAW
+  );
   glBufferSubData(
     GL_ARRAY_BUFFER,
     0,
     sizeof(points) * points.size() ,
-    &points.front());
-  
+    &points.front()
+  );
   glBufferSubData(
     GL_ARRAY_BUFFER, 
     sizeof(points) * points.size() , 
     sizeof(colors) * colors.size() , 
-    &colors.front());
+    &colors.front()
+  );
 
 
   // Load shaders and use the resulting shader program
-  GLuint program = InitShader("vshader41.glsl", "fshader41.glsl");
+  GLuint program = InitShader("./shaders/vshader41.glsl", "./shaders/fshader41.glsl");
   glUseProgram(program);
 
   // set up vertex arrays
@@ -163,7 +94,7 @@ void init()
   GLuint vColor = glGetAttribLocation(program, "vColor"); 
   glEnableVertexAttribArray(vColor);
   glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0,
-			BUFFER_OFFSET(sizeof(points)));
+			BUFFER_OFFSET(sizeof(points)*points.size()));
 
 
 
@@ -176,11 +107,9 @@ void init()
   glClearColor(1.0, 1.0, 1.0, 1.0); 
 }
 
-//----------------------------------------------------------------------------
 extern "C" void display()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
   // radius 
   // theta rotates about the y axis in the ???? coordinate system
@@ -188,14 +117,12 @@ extern "C" void display()
   // cos 
 
   point4  eye(
-        mvx   +   radius *  sin(theta) * cos(phi),
-	      
+        xEyeOffset   +   radius *  sin(theta) * cos(phi),
         radius  *   sin(theta) *   sin(phi),
-	      
-        mvz   +   radius    *    cos(theta),
-	      
+        zEyeOffset   +   radius    *    cos(theta),
         1.0);
-  point4  at(mvx, 0.0, mvz, 1.0);
+  
+  point4  at(xEyeOffset, 0.0, zEyeOffset, 1.0);
 
   
   vec4    up(0.0, 1.0, 0.0, 0.0);
@@ -225,20 +152,19 @@ extern "C" void display()
   glDrawArrays(GL_TRIANGLES, 0, NumVertices);
   */
 
-  /*
+  
   // What does this do?
   mv = RotateZ(angle)*Translate(0.5, 0.0, 0.5)*RotateY(doorAngle)*Translate(-0.5, 0.0, -0.5);
   glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
   glDrawArrays(GL_TRIANGLES, 0, 6);
-  */
-
+  
+  
   glutSwapBuffers();
 }
 
-//----------------------------------------------------------------------------
 
-extern "C" void keyboard(unsigned char key, int x, int y)
-{
+
+extern "C" void keyboard(unsigned char key, int x, int y){
   switch(key) {
   case 033: // Escape Key
   case 'q': case 'Q':
@@ -283,17 +209,13 @@ extern "C" void keyboard(unsigned char key, int x, int y)
   glutPostRedisplay();
 }
 
-//----------------------------------------------------------------------------
-extern "C" void reshape(int width, int height)
-{
+extern "C" void reshape(int width, int height){
   glViewport(0, 0, width, height);
 
   aspect = GLfloat(width)/height;
 }
 
-// Simple animation
-extern "C" void idle()
-{
+extern "C" void idle(){
   // Added code to account for glutElapsedTime
   static GLint lasttime = glutGet(GLUT_ELAPSED_TIME);
   GLint time = glutGet(GLUT_ELAPSED_TIME);
@@ -328,15 +250,34 @@ extern "C" void idle()
   glutPostRedisplay();
 }
 
+extern "C" void special(int key, int x, int y){
+  switch(key) {
+  case GLUT_KEY_UP:
+    zEyeOffset+=0.1;
+    break;
+  case GLUT_KEY_DOWN:
+    zEyeOffset-=0.1;
+    break;
+  case GLUT_KEY_LEFT:
+    xEyeOffset-=0.1;
+    break;
+  case GLUT_KEY_RIGHT:
+    xEyeOffset+=0.1;
+    break;
+  }
+}
 
-//----------------------------------------------------------------------------
-int main(int argc, char **argv)
-{
-  glutInit(&argc, argv);
+void createglutwindow(){
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
   glutInitWindowSize(512, 512);
   glutCreateWindow("Color Cube");
+}
 
+//----------------------------------------------------------------------------
+int main(int argc, char **argv){
+  
+  glutInit(&argc, argv);
+  createglutwindow();
   glewInit();
 
   init();

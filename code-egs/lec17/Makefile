@@ -23,7 +23,7 @@
 # last-modified: Fri Oct 16 13:01:06 2015
 
 # Assumes the following file exists in the proper place.
-include /home/cs425/code-egs/Makefile.defs
+include ../Makefile.defs
 
 # Next line says what options to use to compile programs
 OPTIONS+=-Wall

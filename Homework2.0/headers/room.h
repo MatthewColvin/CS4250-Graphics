@@ -4,10 +4,11 @@
 
 using std::vector;
 using std::string;
+typedef Angel::vec4  color4;
+typedef Angel::vec4  point4;
 
 class Room{
     public:
-        
         Room();
         Room(int lenth, int width, int height);
         
@@ -19,14 +20,13 @@ class Room{
         GLuint  shaders;
 
     private:
-        typedef Angel::vec4  color4;
-        typedef Angel::vec4  point4;
 
         void init_points();
         void MyQuad(int a, int b, int c, int d);
         void colorcube();
         inline int NumVertices(){return points.size();} 
 
+        int Index = 0;
 
         color4 vertex_colors[8];
         point4 vertices[8];
