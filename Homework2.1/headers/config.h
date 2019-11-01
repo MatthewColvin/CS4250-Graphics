@@ -13,9 +13,14 @@ typedef Angel::vec4  point4;
         // to never be changed during execution
 //
 
-    GLfloat xEyeOffset;
-    GLfloat zEyeOffset;
-    
+    GLfloat xEyeOffset = 0;
+    GLfloat zEyeOffset = 0;
+    GLfloat xAtOffset = 0;
+    GLfloat zAtOffset = 0;
+
+    int windowWidth = 512;
+    int windowHeight = 512;
+
     point4 vertices[8] = {
         point4(-0.5, -0.5,  0.5, 1.0),
         point4(-0.5,  0.5,  0.5, 1.0),
@@ -75,15 +80,17 @@ typedef Angel::vec4  point4;
 
 
 //Glut Callbacks
-  extern "C" void special(int key, int x, int y);
-  extern "C" void display();
-  extern "C" void reshape(int width, int height);
-  extern "C" void idle();
-  extern "C" void special(int key, int x, int y);
+    extern "C" void passivemouse(int btn, int state, int x, int y);
+    extern "C" void special(int key, int x, int y);
+    extern "C" void display();
+    extern "C" void reshape(int width, int height);
+    extern "C" void idle();
+    extern "C" void special(int key, int x, int y);
 //
 
 //Setup Functions
     void createglutwindow();
+    void setupglutcallbacks();
 //
 
 // Vertices of a unit cube centered at origin, sides aligned with axes

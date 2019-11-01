@@ -32,7 +32,6 @@ void MyQuad(int a, int b, int c, int d)
 // generate 12 triangles: 36 vertices and 36 colors
 void colorcube()
 {
-  
   MyQuad(1, 0, 3, 2);
   MyQuad(2, 3, 7, 6);
   MyQuad(3, 0, 4, 7);
@@ -143,26 +142,30 @@ extern "C" void display()
 
 
   // What does this draw?
-  /*
+  
   // The Y translation is so that the two planes aren't at the exact
   // same z-value which will cause artifacts in the scene.  Try making
   // it 0 and see what happens.
+  
+  
   mv = Translate(trans, 0.001, 0.5);
   glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
   glDrawArrays(GL_TRIANGLES, 0, NumVertices);
-  */
+  
 
   
-  // What does this do?
-  mv = RotateZ(angle)*Translate(0.5, 0.0, 0.5)*RotateY(doorAngle)*Translate(-0.5, 0.0, -0.5);
-  glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  // // What does this do?
+  // mv = RotateZ(angle)*Translate(0.5, 0.0, 0.5)*RotateY(doorAngle)*Translate(-0.5, 0.0, -0.5);
+  // glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
+  // glDrawArrays(GL_TRIANGLES, 0, 6);
   
   
   glutSwapBuffers();
 }
 
-
+extern "C" void passivemouse(int btn, int state, int x, int y){
+  
+}
 
 extern "C" void keyboard(unsigned char key, int x, int y){
   switch(key) {
@@ -211,7 +214,9 @@ extern "C" void keyboard(unsigned char key, int x, int y){
 
 extern "C" void reshape(int width, int height){
   glViewport(0, 0, width, height);
-
+  
+  windowWidth=width;
+  windowHeight=height;
   aspect = GLfloat(width)/height;
 }
 
@@ -253,10 +258,10 @@ extern "C" void idle(){
 extern "C" void special(int key, int x, int y){
   switch(key) {
   case GLUT_KEY_UP:
-    zEyeOffset+=0.1;
+    zEyeOffset-=0.1;
     break;
   case GLUT_KEY_DOWN:
-    zEyeOffset-=0.1;
+    zEyeOffset+=0.1;
     break;
   case GLUT_KEY_LEFT:
     xEyeOffset-=0.1;
@@ -269,8 +274,16 @@ extern "C" void special(int key, int x, int y){
 
 void createglutwindow(){
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-  glutInitWindowSize(512, 512);
+  glutInitWindowSize(windowWidth, windowHeight);
   glutCreateWindow("Color Cube");
+}
+void setupglutcallbacks(){
+  glutDisplayFunc(display);
+  glutKeyboardFunc(keyboard);
+  glutSpecialFunc(special);
+  glutIdleFunc(idle);
+  glutReshapeFunc(reshape);
+  glutMouseFunc(passivemouse);
 }
 
 //----------------------------------------------------------------------------
@@ -282,12 +295,8 @@ int main(int argc, char **argv){
 
   init();
 
-  glutDisplayFunc(display);
-  glutKeyboardFunc(keyboard);
-  glutSpecialFunc(special);
-  glutIdleFunc(idle);
-  glutReshapeFunc(reshape);
-
+  setupglutcallbacks();
   glutMainLoop();
+
   return(EXIT_SUCCESS);
 }
