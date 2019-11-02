@@ -4,7 +4,6 @@ const GLfloat dr = 90.0 * DegreesToRadians;
 
 bool rotatep=false;          // whether to rotate or not
 
-
 GLfloat theta = 0.0;
 GLfloat phi = 0.0;
 GLfloat angle = 0.0;
@@ -41,28 +40,5 @@ GLfloat mvy=0.0;
 GLfloat mvz=0.0;
 
 
-
-//----------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------
-extern "C" void reshape(int width, int height)
-{
-  glViewport(0, 0, width, height);
-
-  aspect = GLfloat(width)/height;
-}
-
-
-//----------------------------------------------------------------------------
-
 // Simple animation
-extern "C" void idle()
-{
-  // Code to animate cube goes here.
-  if (rotatep) {
-    angle+=1;
-  }
-  glutPostRedisplay();
-}
 

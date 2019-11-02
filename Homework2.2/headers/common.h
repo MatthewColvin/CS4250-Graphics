@@ -54,8 +54,7 @@ extern GLfloat aspect;
 extern int Index;          // Keep track of how many points we generate.
 
 
-extern "C" void reshape(int width, int height);
-extern "C" void idle();
+
 void init();
 
 #endif

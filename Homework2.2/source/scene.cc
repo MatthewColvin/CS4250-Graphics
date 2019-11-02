@@ -8,8 +8,9 @@
 
 extern "C" void special(int key, int x, int y);
 extern "C" void keyboard(unsigned char key, int x, int y);
-
-
+extern "C" void reshape(int width, int height);
+extern "C" void idle();
+ 
 GLfloat incr=0.1;
 
 
@@ -239,7 +240,21 @@ extern "C" void keyboard(unsigned char key, int x, int y)
 
   glutPostRedisplay();
 }
+extern "C" void reshape(int width, int height)
+{
+  glViewport(0, 0, width, height);
 
+  aspect = GLfloat(width)/height;
+}
+
+extern "C" void idle()
+{
+  // Code to animate cube goes here.
+  if (rotatep) {
+    angle+=1;
+  }
+  glutPostRedisplay();
+}
 
 //----------------------------------------------------------------------------
 int main(int argc, char **argv)
