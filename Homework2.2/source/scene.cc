@@ -93,7 +93,7 @@ void Scene::init(){
 
   glBufferData(
     GL_ARRAY_BUFFER, 
-    globalpoints.size()*sizeof(vec4) + globalpoints.size()*sizeof(vec4),
+    globalpoints.size()*sizeof(vec4) + globalcolors.size()*sizeof(vec4),
 	  NULL,
     GL_STATIC_DRAW
   );

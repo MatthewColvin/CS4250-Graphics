@@ -4,7 +4,6 @@
 #include <Angel.h>
 #include <vector>
 using std::vector;
-
 typedef Angel::vec4 color4;
 typedef Angel::vec4 point4;
 

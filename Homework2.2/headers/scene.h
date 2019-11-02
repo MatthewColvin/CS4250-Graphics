@@ -37,7 +37,7 @@ class Scene{
 
 		const GLfloat dr = 90.0 * DegreesToRadians;
 
-
+		
 
 		GLint  camera_view;// camera-view matrix uniform shader variable location
 		GLint  model_view; // model-view matrix uniform shader variable locatio
