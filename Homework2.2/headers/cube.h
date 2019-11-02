@@ -17,10 +17,12 @@ public:
   void set_mv(mat4 nmv){
     mv=nmv;
   }
+  void colorcube(vector<vec4> colors);
 private:
   mat4 mv;
   GLint model_view;
   int Initial_Point;
   int NumVertices;
+  
 };
 #endif

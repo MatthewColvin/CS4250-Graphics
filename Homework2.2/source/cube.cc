@@ -31,7 +31,7 @@ void MyQuad(int a, int b, int c, int d, vec4& color)
 //----------------------------------------------------------------------------
 
 // generate 12 triangles: 36 vertices and 36 colors
-void colorcube(vector<vec4> colors1)
+void cube::colorcube(vector<vec4> colors1)
 {
   MyQuad(1, 0, 3, 2, colors1[0]);
   MyQuad(2, 3, 7, 6, colors1[1]);

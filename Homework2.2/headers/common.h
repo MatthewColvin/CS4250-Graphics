@@ -53,7 +53,7 @@ extern GLfloat aspect;
 extern int Index;          // Keep track of how many points we generate.
 
 void MyQuad(int a, int b, int c, int d);
-void colorcube(vector<vec4> colors);
+
 
 extern "C" void reshape(int width, int height);
 extern "C" void keyboard(unsigned char key, int x, int y);

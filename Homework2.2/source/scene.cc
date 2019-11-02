@@ -84,6 +84,7 @@ extern "C" void display()
   vec4    up(0.0, 1.0, 0.0, 0.0);
   mat4  cv = LookAt(eye, at, up);
   
+  cv = cv * Translate(mvx,mvy,mvz);
   
   glUniformMatrix4fv(camera_view, 1, GL_TRUE, cv);
 
