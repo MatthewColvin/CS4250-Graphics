@@ -26,6 +26,7 @@ extern vector<color4> normals;
 extern GLfloat radius;
 extern GLfloat radiusInit;
 
+extern GLfloat cameraangle;
 extern GLfloat theta;
 extern GLfloat phi;
 

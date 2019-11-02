@@ -28,6 +28,7 @@
 #include "cube.h"
 #include "cube_door.h"
 #include "sphere.h"
+#include "camera.h"
 
 // Implementing a door that opens by swinging
 GLfloat doorAngle = 0.0;       // Angle of cube's door's rotation.
@@ -39,7 +40,7 @@ GLfloat transinc = 1.0;// trans increment of 2nd cube.
 cube_door mycube;
 cube mycube2;
 sphere mysphere;
-
+Camera camera;
 //----------------------------------------------------------------------------
 // OpenGL initialization
 void init()
@@ -99,11 +100,17 @@ extern "C" void display()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  point4  eye(mvx+radius*sin(theta)*cos(phi),
-	      mvy+radius*sin(theta)*sin(phi),
+  // point4  eye(mvx+radius*sin(theta)*cos(phi),
+	//       mvy+radius*sin(theta)*sin(phi),
+	//       mvz+radius*cos(theta),
+	//       1.0);
+
+  point4  eye(mvx,
+	      mvy,
 	      mvz+radius*cos(theta),
 	      1.0);
-  point4  at(0, 0, 0, 1.0);
+
+  point4  at(mvx+cameraangle, mvy, 0, 1.0);
   vec4    up(0.0, 1.0, 0.0, 0.0);
 
   mat4  cv = LookAt(eye, at, up);

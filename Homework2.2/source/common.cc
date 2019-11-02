@@ -7,6 +7,7 @@ bool rotatep=false;          // whether to rotate or not
 GLfloat theta = 0.0;
 GLfloat phi = 0.0;
 GLfloat angle = 0.0;
+GLfloat cameraangle = 0.0;
 
 GLfloat left = -1.0, right = 1.0;
 GLfloat bottom = -1.0, top = 1.0;
@@ -45,10 +46,10 @@ extern "C" void special(int key, int x, int y)
 {
   switch(key) {
   case GLUT_KEY_UP:
-    mvz+=incr;
+    mvz-=incr;
     break;
   case GLUT_KEY_DOWN:
-    mvz-=incr;
+    mvz+=incr;
     break;
   case GLUT_KEY_LEFT:
     mvx-=incr;
@@ -106,6 +107,10 @@ extern "C" void keyboard(unsigned char key, int x, int y)
 
   case 'p': phi += dr; break;
   case 'P': phi -= dr; break;
+
+  case 'T': cameraangle += dr; break;
+  case 't': cameraangle -= dr; break;
+
 
   case 'v': 
     fovy-=5; 

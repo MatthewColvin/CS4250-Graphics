@@ -1,10 +1,12 @@
 #ifndef CAMERA_H
 #define CAMERA_H
-#include<Angle.h>
+#include<Angel.h>
 
 class Camera{
     public:
         
+        Camera();
+
         void moveforward(float amount);
         void moveback(float amount);
         
@@ -17,11 +19,11 @@ class Camera{
         void turnleft(float degrees);
         void turnright(float degrees);
 
-        inline mat4 generate_modelview(){Look};
+        inline mat4 generate_modelview(){return(LookAt(eye,at,upvec));}
 
     private:
-        vec4 eyecoords;
-        vec4 atcoords;
+        vec4 eye;
+        vec4 at;
         vec4 upvec;
 
 };
