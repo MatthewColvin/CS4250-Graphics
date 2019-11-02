@@ -22,7 +22,6 @@ void init()
   GLuint vao;
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
-
   // Create and initialize a buffer object
   GLuint buffer;
   glGenBuffers(1, &buffer);
@@ -38,32 +37,88 @@ void init()
   shade_loc = glGetUniformLocation(program, "shade");
     
   // First set up all the models
-  vector<vec4> colors1 {vec4(1,0,0,1), vec4(0,1,0,1), vec4(0,0,1,1), 
-                        vec4(1,1,0,1), vec4(1,0,1,1), vec4(0,1,1,1)};
-  mycube.init(colors1,model_view,0, false);
+  vector<vec4> colors1 {
+    vec4(1,0,0,1), 
+    vec4(0,1,0,1), 
+    vec4(0,0,1,1), 
+    vec4(1,1,0,1), 
+    vec4(1,0,1,1), 
+    vec4(0,1,1,1)
+  };
+  vector<vec4> colors2{
+    vec4(0.5,0.5,0,1), 
+    vec4(0,0.5,0,1),
+    vec4(0,0,0.5,1),
+    vec4(0.5,0.5,0,1), 
+    vec4(0.5,0,0.5,1), 
+    vec4(0,0.5,0.5,1)
+  };
 
-  vector<vec4> colors2{vec4(0.5,0.5,0,1), vec4(0,0.5,0,1), vec4(0,0,0.5,1),
-                       vec4(0.5,0.5,0,1), vec4(0.5,0,0.5,1), vec4(0,0.5,0.5,1)};
-  mycube2.init(colors2,model_view,points.size(), false);
-  
-  mysphere.init(vec4(1.0, 0.5, 0.1, 1), model_view, points.size(), false);
+  mycube.init(
+    colors1,
+    model_view,
+    0, 
+    false
+  );
+  mycube2.init(
+    colors2,
+    model_view,
+    points.size(), 
+    false
+  );
+  mysphere.init(
+    vec4(1.0, 0.5, 0.1, 1), 
+    model_view, 
+    points.size(), 
+    false
+  );
 
   // Now send the data to the GPU
   // set up vertex arrays
   GLuint vPosition = glGetAttribLocation(program, "vPosition");
   glEnableVertexAttribArray(vPosition);
-  glVertexAttribPointer(vPosition, 4, GL_FLOAT, GL_FALSE, 0,
-			BUFFER_OFFSET(0));
+  glVertexAttribPointer(
+    vPosition, 
+    4, 
+    GL_FLOAT, 
+    GL_FALSE, 
+    0,
+		BUFFER_OFFSET(0)
+  );
+
 
   GLuint vColor = glGetAttribLocation(program, "vColor"); 
   glEnableVertexAttribArray(vColor);
-  glVertexAttribPointer(vColor, 4, GL_FLOAT, GL_FALSE, 0,
-			BUFFER_OFFSET(points.size()*sizeof(vec4)));
-  glBufferData(GL_ARRAY_BUFFER, points.size()*sizeof(vec4) + points.size()*sizeof(vec4),
-	       NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, points.size()*sizeof(vec4), points[0]);
-  glBufferSubData(GL_ARRAY_BUFFER, points.size()*sizeof(vec4), colors.size()*sizeof(vec4), colors[0]);
+  glVertexAttribPointer(
+    vColor, 
+    4, 
+    GL_FLOAT, 
+    GL_FALSE, 
+    0,
+		BUFFER_OFFSET(points.size()*sizeof(vec4))
+  );
+  
 
+
+  glBufferData(
+    GL_ARRAY_BUFFER, 
+    points.size()*sizeof(vec4) + points.size()*sizeof(vec4),
+	  NULL,
+    GL_STATIC_DRAW
+  );
+  glBufferSubData(
+    GL_ARRAY_BUFFER,
+    0, 
+    points.size()*sizeof(vec4), points[0]
+  );
+  glBufferSubData(
+    GL_ARRAY_BUFFER, 
+    points.size()*sizeof(vec4), 
+    colorvectorrrr.size()*sizeof(vec4), 
+    colorvectorrrr[0]
+  );
+
+  
   glEnable(GL_DEPTH_TEST);
   glClearColor(1.0, 1.0, 1.0, 1.0); 
 }

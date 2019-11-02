@@ -2,9 +2,9 @@
 
 void triangle(point4& a, point4& b, point4& c, vec4 &color)
 {
-  colors.push_back(color); points.push_back(a);a.w=0.0;normals.push_back(a);a.w=1.0;
-  colors.push_back(color); points.push_back(b);b.w=0.0;normals.push_back(b);b.w=1.0;
-  colors.push_back(color); points.push_back(c);c.w=0.0;normals.push_back(c);c.w=1.0;
+  colorvectorrrr.push_back(color); points.push_back(a);a.w=0.0;normals.push_back(a);a.w=1.0;
+  colorvectorrrr.push_back(color); points.push_back(b);b.w=0.0;normals.push_back(b);b.w=1.0;
+  colorvectorrrr.push_back(color); points.push_back(c);c.w=0.0;normals.push_back(c);c.w=1.0;
 }
 
 //----------------------------------------------------------------------------

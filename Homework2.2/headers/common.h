@@ -19,7 +19,7 @@ typedef Angel::vec4 color4;
 typedef Angel::vec4 point4;
 
 extern vector<point4> points;
-extern vector<color4> colors;
+extern vector<color4> colorvectorrrr;
 extern vector<color4> normals;
 
 // Viewing transformation parameters

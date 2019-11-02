@@ -19,13 +19,13 @@ point4 vertices[8] = {
 //    to the vertices
 void cube::MyQuad(int a, int b, int c, int d, vec4& color)
 {
-  colors.push_back(color); points.push_back(vertices[a]);
-  colors.push_back(color); points.push_back(vertices[b]);
-  colors.push_back(color); points.push_back(vertices[c]);
+  colorvectorrrr.push_back(color); points.push_back(vertices[a]);
+  colorvectorrrr.push_back(color); points.push_back(vertices[b]);
+  colorvectorrrr.push_back(color); points.push_back(vertices[c]);
 
-  colors.push_back(color); points.push_back(vertices[a]);
-  colors.push_back(color); points.push_back(vertices[c]);
-  colors.push_back(color); points.push_back(vertices[d]);
+  colorvectorrrr.push_back(color); points.push_back(vertices[a]);
+  colorvectorrrr.push_back(color); points.push_back(vertices[c]);
+  colorvectorrrr.push_back(color); points.push_back(vertices[d]);
 }
 
 //----------------------------------------------------------------------------
@@ -53,9 +53,11 @@ void cube::draw()
 // Initialization function.
 void cube::init(vector<vec4> ncolors, GLint nmodel_view,int nInitial_Point, bool ninit)
 {
+  wallcolors = ncolors;
   if (!ninit) {
-    colorcube(ncolors);
+    colorcube(wallcolors);
   }
+  
   NumVertices=36;
 
   model_view=nmodel_view;

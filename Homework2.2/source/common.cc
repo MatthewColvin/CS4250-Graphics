@@ -31,7 +31,7 @@ GLint  shade_loc;  // shade uniform shader variable location
 
 // Triangle data for the cube
 vector<point4> points;
-vector<color4> colors;
+vector<color4> colorvectorrrr;
 vector<color4> normals;
 
 GLfloat mvx=0.0;

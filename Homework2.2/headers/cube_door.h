@@ -9,7 +9,7 @@ using std::vector;
 class cube_door: public cube
 {
 public:
-  void init(vector<vec4> colors, GLint nmodel_view,int nInitial_Point, bool ninit);
+  void init(vector<vec4> colorvectorrrr, GLint nmodel_view,int nInitial_Point, bool ninit);
   void draw();
   void set_doorAngle(GLfloat ndoorAngle){
     doorAngle=ndoorAngle;
