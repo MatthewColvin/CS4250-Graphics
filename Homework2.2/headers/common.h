@@ -8,12 +8,13 @@ using std::vector;
 using std::cout;
 using std::cerr;
 using std::endl;
+
 // Globals to control moving around a scene.
 extern GLfloat mvx;
 extern GLfloat mvy;
 extern GLfloat mvz;
 
-extern "C" void special(int key, int x, int y);
+
 
 typedef Angel::vec4 color4;
 typedef Angel::vec4 point4;
@@ -54,7 +55,6 @@ extern int Index;          // Keep track of how many points we generate.
 
 
 extern "C" void reshape(int width, int height);
-extern "C" void keyboard(unsigned char key, int x, int y);
 extern "C" void idle();
 void init();
 

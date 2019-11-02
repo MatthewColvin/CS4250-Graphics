@@ -12,6 +12,8 @@ GLfloat doorAngleIncr = 30.0;   // Amount to increment Angle of cube's
 GLfloat trans = 0.0;   // trans of 2nd cube.
 GLfloat transinc = 1.0;// trans increment of 2nd cube.
 
+
+
 cube_door mycube;
 cube mycube2;
 sphere mysphere;
