@@ -53,14 +53,17 @@ class Scene{
 		GLfloat transinc = 1.0;// trans increment of 2nd cube.
 
 		/// end temp public
-
-		cube_door mycube;
-		cube mycube2;
-		sphere mysphere;
+		
+		cube* mycube2 ;
+		cube_door* mycube;
+		sphere* mysphere;
 
 		Camera camera(){return scenecamera;}
 	private:
-		
+		vector<point4> AllVertices;
+		vector<color4> AllColors;
+		vector<norm4> AllNormals;
+
 		Camera scenecamera;
 
 

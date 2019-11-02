@@ -12,12 +12,13 @@ extern point4 vertices[8];
 class cube : private object {
 public:
   cube(){};
+  cube(vector<point4>* globalpoints,vector<color4>* globalcolors){object(globalpoints,globalcolors);};
   void draw();
-  void init(vector<color4> globalcolors, GLint nmodel_view,int nInitial_Point, bool ninit);
+  void init(vector<color4> oldglobalcolors, GLint nmodel_view,int nInitial_Point, bool ninit);
   void set_mv(mat4 nmv){
     mv=nmv;
   }
-  void colorcube(vector<vec4> globalcolors);
+  void colorcube(vector<vec4> oldglobalcolors);
   void MyQuad(int a, int b, int c, int d,vec4& color);
 private:
   mat4 mv;

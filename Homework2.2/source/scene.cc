@@ -6,6 +6,8 @@
 #include "camera.h"
 #include "scene.h"
 
+
+
 //----------------------------------------------------------------------------
 // OpenGL initialization
 void Scene::init(){
@@ -45,22 +47,27 @@ void Scene::init(){
     vec4(0,0.5,0.5,1)
   };
 
-  mycube.init(
+  mycube = new cube_door();
+  mycube->init(
     colors1,
     model_view,
     0, 
     false
   );
-  mycube2.init(
+
+  mycube2 = new cube();
+  mycube2->init(
     colors2,
     model_view,
-    globalpoints.size(), 
+    oldglobalpoints.size(), 
     false
   );
-  mysphere.init(
+
+  mysphere = new sphere();
+  mysphere->init(
     vec4(1.0, 0.5, 0.1, 1), 
     model_view, 
-    globalpoints.size(), 
+    oldglobalpoints.size(), 
     false
   );
 
@@ -86,27 +93,27 @@ void Scene::init(){
     GL_FLOAT, 
     GL_FALSE, 
     0,
-		BUFFER_OFFSET(globalpoints.size()*sizeof(vec4))
+		BUFFER_OFFSET(oldglobalpoints.size()*sizeof(vec4))
   );
   
 
 
   glBufferData(
     GL_ARRAY_BUFFER, 
-    globalpoints.size()*sizeof(vec4) + globalcolors.size()*sizeof(vec4),
+    oldglobalpoints.size()*sizeof(vec4) + oldglobalcolors.size()*sizeof(vec4),
 	  NULL,
     GL_STATIC_DRAW
   );
   glBufferSubData(
     GL_ARRAY_BUFFER,
     0, 
-    globalpoints.size()*sizeof(vec4), globalpoints[0]
+    oldglobalpoints.size()*sizeof(vec4), oldglobalpoints[0]
   );
   glBufferSubData(
     GL_ARRAY_BUFFER, 
-    globalpoints.size()*sizeof(vec4), 
-    globalcolors.size()*sizeof(vec4), 
-    globalcolors[0]
+    oldglobalpoints.size()*sizeof(vec4), 
+    oldglobalcolors.size()*sizeof(vec4), 
+    oldglobalcolors[0]
   );
 
   

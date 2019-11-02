@@ -29,7 +29,7 @@ extern "C" void cube2idle(){
     scene.doorAngle = 0.0;
     scene.doorAngleIncr*=-1.0;
   }
-  scene.mycube.set_doorAngle(scene.doorAngle);
+  scene.mycube->set_doorAngle(scene.doorAngle);
 
   // Do the animation code here in idle, not in display.
   //  Code for moving 2nd cube
@@ -164,17 +164,17 @@ extern "C" void display(){
   glUniform1i(scene.shade_loc, false);
 
   mat4 mv = RotateZ(scene.angle);
-  scene.mycube.set_mv(mv);
-  scene.mycube.draw();
+  scene.mycube->set_mv(mv);
+  scene.mycube->draw();
 
   mv = Translate(0, 4.2,0)*RotateX(scene.angle)*Scale(1, 2, 3);
-  scene.mycube2.set_mv(mv);
-  scene.mycube2.draw();
+  scene.mycube2->set_mv(mv);
+  scene.mycube2->draw();
 
   glUniform1i(scene.shade_loc, true);
   mv = Translate(0, -5.2,0)*RotateX(scene.angle)*Scale(1, 4, 2);
-  scene.mysphere.set_mv(mv);
-  scene.mysphere.draw();
+  scene.mysphere->set_mv(mv);
+  scene.mysphere->draw();
 
   glutSwapBuffers();
 }

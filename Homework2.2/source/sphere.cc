@@ -1,9 +1,9 @@
 #include "sphere.h"
 
 void triangle(point4& a, point4& b, point4& c, vec4 &color){
-  globalcolors.push_back(color); globalpoints.push_back(a);a.w=0.0;globalnormals.push_back(a);a.w=1.0;
-  globalcolors.push_back(color); globalpoints.push_back(b);b.w=0.0;globalnormals.push_back(b);b.w=1.0;
-  globalcolors.push_back(color); globalpoints.push_back(c);c.w=0.0;globalnormals.push_back(c);c.w=1.0;
+  oldglobalcolors.push_back(color); oldglobalpoints.push_back(a);a.w=0.0;oldglobalnormals.push_back(a);a.w=1.0;
+  oldglobalcolors.push_back(color); oldglobalpoints.push_back(b);b.w=0.0;oldglobalnormals.push_back(b);b.w=1.0;
+  oldglobalcolors.push_back(color); oldglobalpoints.push_back(c);c.w=0.0;oldglobalnormals.push_back(c);c.w=1.0;
 }
 
 //----------------------------------------------------------------------------

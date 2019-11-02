@@ -17,13 +17,13 @@ point4 vertices[8] = {
 //    to the vertices
 void cube::MyQuad(int a, int b, int c, int d, vec4& color){
   
-  globalcolors.push_back(color); globalpoints.push_back(vertices[a]);
-  globalcolors.push_back(color); globalpoints.push_back(vertices[b]);
-  globalcolors.push_back(color); globalpoints.push_back(vertices[c]);
+  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[a]);
+  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[b]);
+  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[c]);
 
-  globalcolors.push_back(color); globalpoints.push_back(vertices[a]);
-  globalcolors.push_back(color); globalpoints.push_back(vertices[c]);
-  globalcolors.push_back(color); globalpoints.push_back(vertices[d]);
+  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[a]);
+  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[c]);
+  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[d]);
 }
 
 //----------------------------------------------------------------------------
