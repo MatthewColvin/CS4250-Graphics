@@ -55,7 +55,7 @@ camera.o: $(srcpth)camera.cc $(headerpth)camera.h
 
 
 
-homework2: common.o  cube.o  sphere.o  cube_door.o camera.o 
+homework2: common.o $(headerpth)common.h cube.o $(headerpth)cube.h $(srcpth)scene.cc $(headerpth)sphere.h sphere.o $(headerpth)cube_door.h cube_door.o camera.o $(headerpth)camera.h $(srcpth)camera.cc
 	$(CC)  $(srcpth)scene.cc common.o cube.o cube_door.o camera.o sphere.o $(InitShader) $(InitHeaders) $(OPTIONS) $(LDLIBS) -o homework2
 clean:
 	rm -f $(OBJECTS) *.o *~

@@ -1,28 +1,3 @@
-//
-// Perspective view of several objects using LookAt() and Perspective()
-//
-// Colors are assigned to each vertex and then the rasterizer interpolates
-//   those colors across the triangles.
-//
-// Modified by David Chelberg
-// last-modified: Fri Nov  1 11:42:30 2019
-// Added classes for sphere, cube
-// Many mods throughout, including using vectors for points, colors,
-// and normals.
-//
-// last-modified: Fri Oct 28 14:06:29 2016
-// Added an animated rotation to the code.
-// Separated the transform for the camera (camera_view) from the
-//   object (model_view).
-// Added code to draw a "door"
-// Added code to draw a moving second cube (animated moving back and
-//   forth in a straight line).
-// Added code to account for elapsed time in the animations.
-//
-// Modified by David Chelberg
-// last-modified: Wed Oct  2 10:54:10 2019
-// Moved more common code to common.cc and common.h
-
 #include <Angel.h>
 #include "common.h"
 #include "cube.h"
