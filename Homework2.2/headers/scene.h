@@ -14,6 +14,9 @@ GLfloat transinc = 1.0;// trans increment of 2nd cube.
 
 
 
+
+
+
 cube_door mycube;
 cube mycube2;
 sphere mysphere;

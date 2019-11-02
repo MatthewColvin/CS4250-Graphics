@@ -1,16 +1,14 @@
 #include "sphere.h"
 
-void triangle(point4& a, point4& b, point4& c, vec4 &color)
-{
-  colorvectorrrr.push_back(color); points.push_back(a);a.w=0.0;normals.push_back(a);a.w=1.0;
-  colorvectorrrr.push_back(color); points.push_back(b);b.w=0.0;normals.push_back(b);b.w=1.0;
-  colorvectorrrr.push_back(color); points.push_back(c);c.w=0.0;normals.push_back(c);c.w=1.0;
+void triangle(point4& a, point4& b, point4& c, vec4 &color){
+  globalcolors.push_back(color); globalpoints.push_back(a);a.w=0.0;globalnormals.push_back(a);a.w=1.0;
+  globalcolors.push_back(color); globalpoints.push_back(b);b.w=0.0;globalnormals.push_back(b);b.w=1.0;
+  globalcolors.push_back(color); globalpoints.push_back(c);c.w=0.0;globalnormals.push_back(c);c.w=1.0;
 }
 
 //----------------------------------------------------------------------------
 
-point4 unit(point4 p)
-{
+point4 unit(point4 p){
   float len = p.x*p.x + p.y*p.y + p.z*p.z;
     
   point4 t;
@@ -22,9 +20,7 @@ point4 unit(point4 p)
   return t;
 }
 
-void divide_triangle(point4& a, point4& b,
-		     point4& c, int count,vec4 color)
-{
+void divide_triangle(point4& a, point4& b, point4& c, int count,vec4 color){
   if (count > 0) {
     point4 v1 = unit(a + b);
     point4 v2 = unit(a + c);
@@ -39,8 +35,7 @@ void divide_triangle(point4& a, point4& b,
   }
 }
 
-void tetrahedron(int count, vec4 color)
-{
+void tetrahedron(int count, vec4 color){
   point4 v[4] = {
     vec4(0.0, 0.0, 1.0, 1.0),
     vec4(0.0, 0.942809, -0.333333, 1.0),
@@ -54,13 +49,12 @@ void tetrahedron(int count, vec4 color)
   divide_triangle(v[0], v[2], v[3], count, color);
 }
 
-void sphere::draw()
-{
+void sphere::draw(){
   glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
   glDrawArrays(GL_TRIANGLES, Initial_Point, NumVertices);
 }
-void sphere::init(vec4 color, GLint nmodel_view,int nInitial_Point, bool ninit)
-{
+
+void sphere::init(vec4 color, GLint nmodel_view,int nInitial_Point, bool ninit){
   if (!ninit) {
     tetrahedron(NumTimesToSubdivide, color);
   }
