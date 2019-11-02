@@ -28,7 +28,6 @@ GLint  model_view; // model-view matrix uniform shader variable locatio
 GLint  projection; // projection matrix uniform shader variable location
 GLint  shade_loc;  // shade uniform shader variable location
 
-int Index = 0;      // Keeps track of which vertex we are on.
 
 // Triangle data for the cube
 vector<point4> points;
@@ -38,7 +37,3 @@ vector<color4> normals;
 GLfloat mvx=0.0;
 GLfloat mvy=0.0;
 GLfloat mvz=0.0;
-
-
-// Simple animation
-

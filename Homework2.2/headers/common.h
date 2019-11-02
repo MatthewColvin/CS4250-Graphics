@@ -15,7 +15,6 @@ extern GLfloat mvy;
 extern GLfloat mvz;
 
 
-
 typedef Angel::vec4 color4;
 typedef Angel::vec4 point4;
 
@@ -51,10 +50,6 @@ extern GLfloat fovy;
 extern GLfloat aspect;
 
 
-extern int Index;          // Keep track of how many points we generate.
 
-
-
-void init();
 
 #endif
