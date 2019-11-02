@@ -76,7 +76,6 @@ extern "C" void display()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-
   point4  eye(0,0,15,1.0);
 
   point4  at(0,0,3, 1.0);

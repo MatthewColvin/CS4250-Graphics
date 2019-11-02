@@ -17,7 +17,7 @@ point4 vertices[8] = {
 //----------------------------------------------------------------------------
 // MyQuad generates two triangles for each face and assigns colors
 //    to the vertices
-void MyQuad(int a, int b, int c, int d, vec4& color)
+void cube::MyQuad(int a, int b, int c, int d, vec4& color)
 {
   colors.push_back(color); points.push_back(vertices[a]);
   colors.push_back(color); points.push_back(vertices[b]);

@@ -18,6 +18,7 @@ public:
     mv=nmv;
   }
   void colorcube(vector<vec4> colors);
+  void MyQuad(int a, int b, int c, int d,vec4& color);
 private:
   mat4 mv;
   GLint model_view;
