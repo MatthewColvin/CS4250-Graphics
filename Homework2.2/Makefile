@@ -51,13 +51,14 @@ common.o: $(srcpth)common.cc $(headerpth)common.h
 	$(CC) $(srcpth)common.cc -c $(InitHeaders) $(OPTIONS)
 camera.o: $(srcpth)camera.cc $(headerpth)camera.h
 	$(CC) $(srcpth)camera.cc -c $(InitHeaders) $(OPTIONS)
+scene.o :$(srcpth)scene.cc $(headerpth)scene.h
+	$(CC) $(srcpth)scene.cc -c $(InitHeaders) $(OPTIONS)
 
 
 
-
-homework2: common.o $(headerpth)common.h cube.o $(headerpth)cube.h $(srcpth)scene.cc $(headerpth)sphere.h sphere.o $(headerpth)cube_door.h cube_door.o camera.o $(headerpth)camera.h $(srcpth)camera.cc
-	$(CC)  $(srcpth)scene.cc common.o cube.o cube_door.o camera.o sphere.o $(InitShader) $(InitHeaders) $(OPTIONS) $(LDLIBS) -o homework2
+homework2: common.o $(headerpth)common.h cube.o $(headerpth)cube.h $(srcpth)scene.cc $(headerpth)sphere.h sphere.o $(headerpth)cube_door.h cube_door.o camera.o $(headerpth)camera.h $(srcpth)camera.cc $(srcpth)scene.cc $(headerpth)scene.h scene.o
+	$(CC)  Homework2.cc common.o scene.o cube.o cube_door.o camera.o sphere.o $(InitShader) $(InitHeaders) $(OPTIONS) $(LDLIBS) -o homework2
 clean:
 	rm -f $(OBJECTS) *.o *~
-allclean: clean
+squeakyclean: clean
 	rm -f homework2 
