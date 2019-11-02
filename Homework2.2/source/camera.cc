@@ -5,34 +5,28 @@ Camera::Camera(){
 }
 
 void Camera::moveup(float amount){
-    eye.y += amount;
-    at.y += amount;
+    translation *= Translate(0.0,0.0,amount);
 }
 void Camera::movedown(float amount){
-    eye.y -= amount;
-    at.y -= amount;
+    translation*= Translate(-amount,0.0,0.0);
 }
 void Camera::moveleft(float amount){
-    eye.x -= amount;
-    at.x -= amount;
+    translation*= Translate(-amount,0.0,0.0);
 }
 void Camera::moveright(float amount){
-    eye.x += amount;
-    at.x += amount;
+    translation*= Translate(amount,0.0,0.0);
 }
 
 void Camera::moveforward(float amount){
-    eye.z += amount;
-    at.z += amount;
+    translation *= Translate(0.0,0.0,amount);
 }
 void Camera::moveback(float amount){
-    eye.z -= amount;
-    at.z -= amount;
+    translation *= Translate(0.0,0.0,-amount);
 }
 
 void Camera::turnleft(float degrees){
-    at.x += degrees;
+    rotation *= RotateY(-degrees);
 }
 void Camera::turnright(float degrees){
-    at.x -= degrees;
+    rotation *= RotateY(degrees);
 }

@@ -19,12 +19,24 @@ class Camera{
         void turnleft(float degrees);
         void turnright(float degrees);
 
-        inline mat4 generate_modelview(){return(LookAt(eye,at,upvec));}
+        inline mat4 generate_modelview(){return(LookAt(eye,at,upvec) * rotation * translation );}
+
+        
 
     private:
         vec4 eye;
         vec4 at;
         vec4 upvec;
+
+        mat4 translation = mat4(0.0, 0.0 ,0.0, 1.0,
+                                0.0, 0.0 ,0.0, 1.0,
+                                0.0, 0.0 ,0.0, 1.0,
+                                0.0, 0.0 ,0.0, 1.0);
+        
+        mat4 rotation = mat4(1.0, 0.0 ,0.0, 1.0,
+                             0.0, 1.0 ,0.0, 1.0,
+                             0.0, 0.0 ,1.0, 1.0,
+                             0.0, 0.0 ,0.0, 1.0);
 
 };
 

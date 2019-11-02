@@ -49,6 +49,7 @@ extern GLfloat zNearInit, zFarInit;
 extern GLfloat fovy;
 extern GLfloat aspect;
 
+
 extern int Index;          // Keep track of how many points we generate.
 
 void MyQuad(int a, int b, int c, int d);

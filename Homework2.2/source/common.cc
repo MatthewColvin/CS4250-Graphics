@@ -1,8 +1,9 @@
 #include "common.h"
 
-const GLfloat dr = 5.0 * DegreesToRadians;
+const GLfloat dr = 90.0 * DegreesToRadians;
 
 bool rotatep=false;          // whether to rotate or not
+
 
 GLfloat theta = 0.0;
 GLfloat phi = 0.0;
@@ -46,16 +47,16 @@ extern "C" void special(int key, int x, int y)
 {
   switch(key) {
   case GLUT_KEY_UP:
-    mvz-=incr;
-    break;
-  case GLUT_KEY_DOWN:
     mvz+=incr;
     break;
+  case GLUT_KEY_DOWN:
+    mvz-=incr;
+    break;
   case GLUT_KEY_LEFT:
-    mvx-=incr;
+    mvx+=incr;
     break;
   case GLUT_KEY_RIGHT:
-    mvx+=incr;
+    mvx-=incr;
     break;
   }
 }

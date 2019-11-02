@@ -100,23 +100,20 @@ extern "C" void display()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // point4  eye(mvx+radius*sin(theta)*cos(phi),
-	//       mvy+radius*sin(theta)*sin(phi),
-	//       mvz+radius*cos(theta),
-	//       1.0);
 
-  point4  eye(mvx,
-	      mvy,
-	      mvz+radius*cos(theta),
-	      1.0);
 
-  point4  at(mvx+cameraangle, mvy, 0, 1.0);
+  point4  eye(0,0,15,1.0);
+
+  point4  at(0,0,3, 1.0);
+
   vec4    up(0.0, 1.0, 0.0, 0.0);
-
   mat4  cv = LookAt(eye, at, up);
+  
+  
   glUniformMatrix4fv(camera_view, 1, GL_TRUE, cv);
 
-  mat4  p = Perspective(fovy, aspect, zNear, zFar);
+  mat4  p = Perspective(fovy, aspect, zNear, zFar) ;
+
   glUniformMatrix4fv(projection, 1, GL_TRUE, p);
 
   glUniform1i(shade_loc, false);
