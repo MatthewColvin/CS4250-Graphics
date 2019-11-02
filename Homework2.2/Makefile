@@ -59,5 +59,5 @@ homework2: common.o $(headerpth)common.h cube.o $(headerpth)cube.h $(srcpth)scen
 	$(CC)  $(srcpth)scene.cc common.o cube.o cube_door.o camera.o sphere.o $(InitShader) $(InitHeaders) $(OPTIONS) $(LDLIBS) -o homework2
 clean:
 	rm -f $(OBJECTS) *.o *~
-allclean: clean
+squeakyclean: clean
 	rm -f homework2 
