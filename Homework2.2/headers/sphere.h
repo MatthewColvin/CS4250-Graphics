@@ -3,10 +3,11 @@
 
 #include <vector>
 #include "common.h"
+#include "object.h"
 using std::vector;
 
 
-class sphere
+class sphere : private object
 {
 public:
   sphere(){};

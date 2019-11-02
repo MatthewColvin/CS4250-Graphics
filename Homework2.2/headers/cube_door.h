@@ -14,7 +14,6 @@ public:
   void set_doorAngle(GLfloat ndoorAngle){
     doorAngle=ndoorAngle;
   };
-
   void set_mv(mat4 nmv){
     mv=nmv;
   };

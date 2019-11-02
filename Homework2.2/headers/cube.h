@@ -3,13 +3,13 @@
 
 #include <vector>
 #include "common.h"
+#include "object.h"
 using std::vector;
 
 // Vertices of a unit cube centered at origin, sides aligned with axes
 extern point4 vertices[8];
 
-class cube
-{
+class cube : private object {
 public:
   cube(){};
   void draw();

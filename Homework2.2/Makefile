@@ -30,27 +30,42 @@ camera.o: $(srcpth)camera.cc $(headerpth)camera.h
 	$(CC) $(srcpth)camera.cc -c $(InitHeaders) $(OPTIONS)
 common.o: $(srcpth)common.cc $(headerpth)common.h
 	$(CC) $(srcpth)common.cc -c $(InitHeaders) $(OPTIONS)
-cube.o: $(headerpth)cube.h $(srcpth)cube.cc common.o
-	$(CC) $(srcpth)cube.cc -c $(InitHeaders) $(OPTIONS)
-cube_door.o: $(headerpth)cube_door.h $(srcpth)cube_door.cc common.o
-	$(CC) $(srcpth)cube_door.cc -c $(InitHeaders) $(OPTIONS)
 scene.o :$(srcpth)scene.cc $(headerpth)scene.h
 	$(CC) $(srcpth)scene.cc -c $(InitHeaders) $(OPTIONS)
-sphere.o: $(headerpth)sphere.h $(srcpth)sphere.cc common.o
-	$(CC) $(srcpth)sphere.cc -c  $(InitHeaders) $(OPTIONS)
+
+############### In world Objects ######################
+
+object.o: $(headerpth)object.h $(srcpth)object.cc
+	$(CC) $(srcpth)object.cc -c $(InitHeaders) $(OPTIONS)  
+
+cube.o: $(headerpth)cube.h \
+        $(srcpth)cube.cc   \
+		common.o object.o
+	$(CC) $(srcpth)cube.cc -c $(InitHeaders) $(OPTIONS)
+cube_door.o: $(headerpth)cube_door.h \
+			 $(srcpth)cube_door.cc   \
+			 common.o object.o
+	$(CC) $(srcpth)cube_door.cc  -c $(InitHeaders) $(OPTIONS)
+sphere.o: $(headerpth)sphere.h \
+		  $(srcpth)sphere.cc   \
+		  common.o object.o
+	$(CC) $(srcpth)sphere.cc  -c  $(InitHeaders) $(OPTIONS)
+
+
+####################################################################
 
 
 
 
 
-
-homework2: common.o    $(headerpth)common.h    \
+homework2: object.o    $(headerpth)object.h    \
+		   common.o    $(headerpth)common.h    \
 		   cube.o      $(headerpth)cube.h      \
 		   scene.o     $(headerpth)scene.h     \
 		   sphere.o    $(headerpth)sphere.h    \
 		   cube_door.o $(headerpth)cube_door.h \
 		   camera.o    $(headerpth)camera.h
-	$(CC)  Homework2.cc common.o scene.o cube.o cube_door.o camera.o sphere.o $(InitShader) $(InitHeaders) $(OPTIONS) $(LDLIBS) -o homework2
+	$(CC)  Homework2.cc common.o object.o scene.o cube.o cube_door.o camera.o sphere.o $(InitShader) $(InitHeaders) $(OPTIONS) $(LDLIBS) -o homework2
 clean:
 	rm -f $(OBJECTS) *.o *~
 squeakyclean: clean
