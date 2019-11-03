@@ -12,9 +12,13 @@ using std::vector;
 class object{
     public:
         object(){};
-        object(vector<point4>* GlobalPoints);
-        object(vector<color4>* GlobalPoints,vector<point4>* GlobalColors);
-        object(vector<color4>* GlobalPoints,vector<point4>* GlobalColors,vector<norm4>* Normals);
+        object(vector<point4>& GlobalPoints);
+        object(vector<color4>& GlobalPoints,vector<point4>& GlobalColors);
+        object(vector<color4>& GlobalPoints,vector<point4>& GlobalColors,vector<norm4>& Normals);
+
+        vector<point4> GlobalPoints(){return *toGlobalPoints;}
+        vector<color4> GlobalColors(){return *toGlobalColors;}
+        vector<norm4> GlobalNormals(){return *toGlobalnorms;}
 
     private:
         vector<point4>* toGlobalPoints;

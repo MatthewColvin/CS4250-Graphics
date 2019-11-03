@@ -17,19 +17,19 @@ point4 vertices[8] = {
 //    to the vertices
 void cube::MyQuad(int a, int b, int c, int d, vec4& color){
   
-  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[a]);
-  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[b]);
-  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[c]);
+  cubescolor.push_back(color); cubespoints.push_back(vertices[a]);
+  cubescolor.push_back(color); cubespoints.push_back(vertices[b]);
+  cubescolor.push_back(color); cubespoints.push_back(vertices[c]);
 
-  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[a]);
-  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[c]);
-  oldglobalcolors.push_back(color); oldglobalpoints.push_back(vertices[d]);
+  cubescolor.push_back(color); cubespoints.push_back(vertices[a]);
+  cubescolor.push_back(color); cubespoints.push_back(vertices[c]);
+  cubescolor.push_back(color); cubespoints.push_back(vertices[d]);
 }
 
 //----------------------------------------------------------------------------
 
 // generate 12 triangles: 36 vertices and 36 colors
-void cube::colorcube(vector<vec4> colors1){
+void cube::makecolorcube(vector<vec4> colors1){
   MyQuad(1, 0, 3, 2, colors1[0]);
   MyQuad(2, 3, 7, 6, colors1[1]);
   MyQuad(3, 0, 4, 7, colors1[2]);
@@ -46,15 +46,21 @@ void cube::draw(){
   glDrawArrays(GL_TRIANGLES, Initial_Point, NumVertices);
 }
 
-// Initialization function.
-void cube::init(vector<vec4> ncolors, GLint nmodel_view,int nInitial_Point, bool ninit){
-  wallcolors = ncolors;
-  if (!ninit) {
-    colorcube(wallcolors);
-  }
-
+cube::cube(vector<point4>& globalpoints,vector<color4>& globalcolors,vector<color4>& wallcolors,
+    GLint shader_mv_loc,
+    int startinvao
+  ){
+  makecolorcube(wallcolors);
   NumVertices=36;
 
-  model_view=nmodel_view;
-  Initial_Point=nInitial_Point;
+
+  model_view=shader_mv_loc;
+  Initial_Point=startinvao;
+
+  globalpoints.insert(globalpoints.end(),
+    cubespoints.begin(),cubespoints.end()
+  );
+  globalcolors.insert(globalcolors.end(),
+    cubescolor.begin(),cubescolor.end()
+  );
 }

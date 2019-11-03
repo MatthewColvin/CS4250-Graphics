@@ -15,14 +15,9 @@ void cube_door::draw()
 }
 
 // Initialization function.
-void cube_door::init(vector<vec4> ncolors, GLint nmodel_view,int nInitial_Point, bool ninit)
-{
-  if (!ninit) {
-    colorcube(ncolors);
-  }
-  NumVertices=36;
+cube_door::cube_door(vector<point4>& globalpoints,vector<color4>& globalcolors,vector<color4>& wallcolors,
+GLint shader_mv_loc,int startinvao):
+cube(globalpoints,globalcolors,wallcolors,shader_mv_loc,startinvao){
 
-  model_view=nmodel_view;
-  Initial_Point=nInitial_Point;
   doorAngle=0.0;
 }

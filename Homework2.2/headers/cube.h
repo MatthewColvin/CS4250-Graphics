@@ -10,22 +10,29 @@ using std::vector;
 extern point4 vertices[8];
 
 class cube : private object {
-public:
-  cube(){};
-  cube(vector<point4>* globalpoints,vector<color4>* globalcolors){object(globalpoints,globalcolors);};
-  void draw();
-  void init(vector<color4> oldglobalcolors, GLint nmodel_view,int nInitial_Point, bool ninit);
-  void set_mv(mat4 nmv){
-    mv=nmv;
-  }
-  void colorcube(vector<vec4> oldglobalcolors);
-  void MyQuad(int a, int b, int c, int d,vec4& color);
-private:
-  mat4 mv;
-  GLint model_view;
-  int Initial_Point;
-  int NumVertices;
-  vector<color4> wallcolors;
-  
+  public:
+    cube(
+      vector<point4>& globalpoints,
+      vector<color4>& globalcolors,
+      vector<color4>& wallcolors,
+      GLint shader_mv_loc,
+      int startinvao
+      );
+    void draw();
+    //void init(vector<color4> wallcolors, GLint nmodel_view,int nInitial_Point, bool ninit);
+    void set_mv(mat4 nmv){
+      mv=nmv;
+    }
+    void makecolorcube(vector<vec4> wallcolors);
+    void MyQuad(int a, int b, int c, int d,vec4& color);
+  private:
+    mat4 mv;
+    vector<point4> cubespoints;
+    vector<color4> cubescolor;
+  protected:
+    int Initial_Point;
+    GLint model_view;
+    int NumVertices;
+
 };
 #endif

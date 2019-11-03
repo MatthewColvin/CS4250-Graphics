@@ -56,10 +56,11 @@ class Scene{
 		
 		cube* mycube2 ;
 		cube_door* mycube;
-		sphere* mysphere;
+		//sphere* mysphere;
 
 		Camera camera(){return scenecamera;}
 	private:
+	public:	
 		vector<point4> AllVertices;
 		vector<color4> AllColors;
 		vector<norm4> AllNormals;

@@ -29,7 +29,7 @@ extern "C" void cube2idle(){
     scene.doorAngle = 0.0;
     scene.doorAngleIncr*=-1.0;
   }
-  scene.mycube->set_doorAngle(scene.doorAngle);
+  //scene.mycube->set_doorAngle(scene.doorAngle);
 
   // Do the animation code here in idle, not in display.
   //  Code for moving 2nd cube
@@ -173,8 +173,9 @@ extern "C" void display(){
 
   glUniform1i(scene.shade_loc, true);
   mv = Translate(0, -5.2,0)*RotateX(scene.angle)*Scale(1, 4, 2);
-  scene.mysphere->set_mv(mv);
-  scene.mysphere->draw();
+  
+  // scene.mysphere->set_mv(mv);
+  // scene.mysphere->draw();
 
   glutSwapBuffers();
 }
@@ -188,7 +189,10 @@ int main(int argc, char **argv){
 
   glewInit();
 
+  std::cout << scene.AllVertices.size() << std::endl;
   scene.init();
+  
+  std::cout.flush();
 
   glutDisplayFunc(display);
   glutKeyboardFunc(keyboard);
