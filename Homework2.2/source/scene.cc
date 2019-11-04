@@ -1,5 +1,4 @@
 #include <Angel.h>
-#include "common.h"
 #include "cube.h"
 #include "cube_door.h"
 #include "sphere.h"
@@ -7,7 +6,6 @@
 #include "scene.h"
 
 
- 
 
 //----------------------------------------------------------------------------
 // OpenGL initialization
@@ -31,7 +29,7 @@ void Scene::init(){
   shade_loc = glGetUniformLocation(program, "shade");
     
   // First set up all the models
-  vector<vec4> colors1 {
+  vector<color4> colors1 {
     vec4(1,0,0,1), 
     vec4(0,1,0,1), 
     vec4(0,0,1,1), 
@@ -39,7 +37,7 @@ void Scene::init(){
     vec4(1,0,1,1), 
     vec4(0,1,1,1)
   };
-  vector<vec4> colors2{
+  vector<color4> colors2{
     vec4(0.5,0.5,0,1), 
     vec4(0,0.5,0,1),
     vec4(0,0,0.5,1),
@@ -48,24 +46,30 @@ void Scene::init(){
     vec4(0,0.5,0.5,1)
   };
 
-  mycube.init(
+  mycube = new cube_door(
+    AllVertices,
+    AllColors,
     colors1,
     model_view,
-    0, 
-    false
+    AllVertices.size()
   );
-  mycube2.init(
+  
+  mycube2 = new cube(
+    AllVertices,
+    AllColors,
     colors2,
     model_view,
-    globalpoints.size(), 
-    false
+    AllVertices.size()
   );
-  mysphere.init(
+
+  mysphere = new sphere(
+    AllVertices,
+    AllColors,
     vec4(1.0, 0.5, 0.1, 1), 
     model_view, 
-    globalpoints.size(), 
-    false
+    AllVertices.size()
   );
+
 
   // Now send the data to the GPU
   // set up vertex arrays
@@ -89,36 +93,32 @@ void Scene::init(){
     GL_FLOAT, 
     GL_FALSE, 
     0,
-		BUFFER_OFFSET(globalpoints.size()*sizeof(vec4))
+		BUFFER_OFFSET(AllVertices.size()*sizeof(vec4))
   );
   
 
 
   glBufferData(
     GL_ARRAY_BUFFER, 
-    globalpoints.size()*sizeof(vec4) + globalpoints.size()*sizeof(vec4),
+    AllVertices.size()*sizeof(vec4) + AllColors.size()*sizeof(vec4),
 	  NULL,
     GL_STATIC_DRAW
   );
   glBufferSubData(
     GL_ARRAY_BUFFER,
     0, 
-    globalpoints.size()*sizeof(vec4), globalpoints[0]
+    AllVertices.size()*sizeof(vec4), AllVertices[0]
   );
   glBufferSubData(
     GL_ARRAY_BUFFER, 
-    globalpoints.size()*sizeof(vec4), 
-    globalcolors.size()*sizeof(vec4), 
-    globalcolors[0]
+    AllVertices.size()*sizeof(vec4), 
+    AllColors.size()*sizeof(vec4), 
+    AllColors[0]
   );
 
   
   glEnable(GL_DEPTH_TEST);
   glClearColor(1.0, 1.0, 1.0, 1.0); 
 }
-
-//----------------------------------------------------------------------------
-
-
 
 //----------------------------------------------------------------------------

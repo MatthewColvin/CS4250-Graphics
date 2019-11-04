@@ -1,9 +1,14 @@
 #include <Angel.h>
-#include "common.h"
 #include "cube.h"
 #include "cube_door.h"
 #include "sphere.h"
 #include "camera.h"
+
+// struct shapedata{
+// 	vector<point4> AllVertices;
+// 	vector<color4> AllColors;
+// 	vector<norm4> AllNormals;
+// };
 
 class Scene{
 	public:
@@ -37,7 +42,7 @@ class Scene{
 
 		const GLfloat dr = 90.0 * DegreesToRadians;
 
-
+		
 
 		GLint  camera_view;// camera-view matrix uniform shader variable location
 		GLint  model_view; // model-view matrix uniform shader variable locatio
@@ -53,14 +58,17 @@ class Scene{
 		GLfloat transinc = 1.0;// trans increment of 2nd cube.
 
 		/// end temp public
-
-		cube_door mycube;
-		cube mycube2;
-		sphere mysphere;
+		
+		cube* mycube2 ;
+		cube_door* mycube;
+		sphere* mysphere;
 
 		Camera camera(){return scenecamera;}
 	private:
-		
+		vector<point4> AllVertices;
+		vector<color4> AllColors;
+		vector<norm4> AllNormals;
+
 		Camera scenecamera;
 
 
