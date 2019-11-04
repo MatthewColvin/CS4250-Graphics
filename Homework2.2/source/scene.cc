@@ -1,5 +1,4 @@
 #include <Angel.h>
-#include "common.h"
 #include "cube.h"
 #include "cube_door.h"
 #include "sphere.h"
@@ -54,8 +53,7 @@ void Scene::init(){
     model_view,
     AllVertices.size()
   );
-
-
+  
   mycube2 = new cube(
     AllVertices,
     AllColors,
@@ -64,13 +62,14 @@ void Scene::init(){
     AllVertices.size()
   );
 
-  // mysphere = new sphere();
-  // mysphere->init(
-  //   vec4(1.0, 0.5, 0.1, 1), 
-  //   model_view, 
-  //   oldglobalpoints.size(), 
-  //   false
-  // );
+  mysphere = new sphere(
+    AllVertices,
+    AllColors,
+    vec4(1.0, 0.5, 0.1, 1), 
+    model_view, 
+    AllVertices.size()
+  );
+
 
   // Now send the data to the GPU
   // set up vertex arrays

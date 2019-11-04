@@ -1,9 +1,14 @@
 #include <Angel.h>
-#include "common.h"
 #include "cube.h"
 #include "cube_door.h"
 #include "sphere.h"
 #include "camera.h"
+
+// struct shapedata{
+// 	vector<point4> AllVertices;
+// 	vector<color4> AllColors;
+// 	vector<norm4> AllNormals;
+// };
 
 class Scene{
 	public:
@@ -56,11 +61,10 @@ class Scene{
 		
 		cube* mycube2 ;
 		cube_door* mycube;
-		//sphere* mysphere;
+		sphere* mysphere;
 
 		Camera camera(){return scenecamera;}
 	private:
-	public:	
 		vector<point4> AllVertices;
 		vector<color4> AllColors;
 		vector<norm4> AllNormals;

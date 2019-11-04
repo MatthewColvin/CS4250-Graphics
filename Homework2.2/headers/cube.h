@@ -2,14 +2,13 @@
 #define cube_h
 
 #include <vector>
-#include "common.h"
 #include "object.h"
 using std::vector;
 
 // Vertices of a unit cube centered at origin, sides aligned with axes
 extern point4 vertices[8];
 
-class cube : private object {
+class cube : protected object {
   public:
     cube(
       vector<point4>& globalpoints,
@@ -27,8 +26,6 @@ class cube : private object {
     void MyQuad(int a, int b, int c, int d,vec4& color);
   private:
     mat4 mv;
-    vector<point4> cubespoints;
-    vector<color4> cubescolor;
   protected:
     int Initial_Point;
     GLint model_view;

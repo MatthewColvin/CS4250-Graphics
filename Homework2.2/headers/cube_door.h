@@ -2,7 +2,6 @@
 #define cube_door_h
 
 #include <vector>
-#include "common.h"
 #include "cube.h"
 using std::vector;
 
