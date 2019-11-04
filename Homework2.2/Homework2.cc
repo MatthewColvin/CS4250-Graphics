@@ -174,8 +174,8 @@ extern "C" void display(){
   glUniform1i(scene.shade_loc, true);
   mv = Translate(0, -5.2,0)*RotateX(scene.angle)*Scale(1, 4, 2);
   
-  //scene.mysphere->set_mv(mv);
-  //scene.mysphere->draw();
+  scene.mysphere->set_mv(mv);
+  scene.mysphere->draw();
 
   glutSwapBuffers();
 }

@@ -1,8 +1,8 @@
 #include "sphere.h"
 
-
-sphere::sphere(vector<point4>& globalpoints,vector<color4>& globalcolors, color4 color, GLint nmodel_view,int nInitial_Point):
-object(globalpoints,globalcolors){
+// normals are never sent to the shader?
+sphere::sphere(vector<point4>& globalpoints,vector<color4>& globalcolors,vector<norm4>& globalnormals, color4 color, GLint nmodel_view,int nInitial_Point):
+object(globalpoints,globalcolors,globalnormals){
   
   tetrahedron(NumTimesToSubdivide, color);
   NumVertices = 3 * NumTriangles;
@@ -12,6 +12,7 @@ object(globalpoints,globalcolors){
 
   globalpoints.insert(globalpoints.end(),points.begin(),points.end());
   globalcolors.insert(globalcolors.end(),colors.begin(),colors.end());
+  globalnormals.insert(globalnormals.end(),normals.begin(),normals.end());
 }
 
 

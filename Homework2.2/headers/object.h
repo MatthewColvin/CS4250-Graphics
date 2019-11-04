@@ -13,6 +13,7 @@ class object{
     public:
         object(vector<point4>& GlobalPoints);
         object(vector<point4>& GlobalPoints,vector<color4>& GlobalColors);
+        object(vector<point4>& GlobalPoints,vector<color4>& GlobalColors,vector<color4>& GlobalNormals);
         void draw(); // Assumes you are drawing triangle soup 
 
     private:
@@ -25,7 +26,8 @@ class object{
 
         vector<point4> points; // objects current geoemetery
         vector<color4> colors; // objects current colors 
-        
+        vector<norm4> normals;
+
         // used to put triangles into the vao to be drawn
         void triangle(point4& a, point4& b, point4& c, vec4 color);
         

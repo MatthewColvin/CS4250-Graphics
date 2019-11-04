@@ -9,7 +9,7 @@ using std::vector;
 class sphere : protected object
 {
 public:
-  sphere(vector<point4>& globalpoints,vector<color4>& globalcolors, color4 color ,GLint nmodel_view ,int nInitial_Point);
+  sphere(vector<point4>& globalpoints,vector<color4>& globalcolors,vector<norm4>& globalnormals, color4 color ,GLint nmodel_view ,int nInitial_Point);
   void set_mv(mat4 nmv){
     mv=nmv;
   }
