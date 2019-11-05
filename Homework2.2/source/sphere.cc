@@ -8,7 +8,7 @@ object(globalpoints,globalcolors,globalnormals){
   NumVertices = 3 * NumTriangles;
 
   model_view=nmodel_view;
-  Initial_Point=nInitial_Point;
+  StartInVao=nInitial_Point;
 
   globalpoints.insert(globalpoints.end(),points.begin(),points.end());
   globalcolors.insert(globalcolors.end(),colors.begin(),colors.end());

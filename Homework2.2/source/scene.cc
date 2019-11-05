@@ -23,9 +23,9 @@ void Scene::init(){
   GLuint program = InitShader("./shaders/vshader41.glsl", "./shaders/fshader41.glsl");
   glUseProgram(program);
 
-  model_view = glGetUniformLocation(program, "model_view");
-  camera_view = glGetUniformLocation(program, "camera_view");
-  projection = glGetUniformLocation(program, "projection");
+  model_view_loc = glGetUniformLocation(program, "model_view");
+  camera_view_loc = glGetUniformLocation(program, "camera_view");
+  projection_loc = glGetUniformLocation(program, "projection");
   shade_loc = glGetUniformLocation(program, "shade");
     
   // First set up all the models
@@ -50,7 +50,7 @@ void Scene::init(){
     AllVertices,
     AllColors,
     colors1,
-    model_view,
+    model_view_loc,
     AllVertices.size()
   );
   
@@ -58,7 +58,7 @@ void Scene::init(){
     AllVertices,
     AllColors,
     colors2,
-    model_view,
+    model_view_loc,
     AllVertices.size()
   );
 
@@ -67,7 +67,7 @@ void Scene::init(){
     AllColors,
     AllNormals,
     vec4(1.0, 0.5, 0.1, 1), 
-    model_view, 
+    model_view_loc, 
     AllVertices.size()
   );
 

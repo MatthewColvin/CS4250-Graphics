@@ -1,14 +1,14 @@
 #include "scene.h"
 
 Scene scene;
+float stepsize = 0.1; 
+float camrotationamount = 0.1;
 
 extern "C" void display();
 extern "C" void cube2idle();
 extern "C" void special(int key, int x, int y);
 extern "C" void keyboard(unsigned char key, int x, int y);
 extern "C" void reshape(int width, int height);
-extern "C" void idle();
-
 
 // Simple animation
 GLint lasttime=0;
@@ -17,49 +17,42 @@ extern "C" void cube2idle(){
   GLint time = glutGet(GLUT_ELAPSED_TIME);
 
   // Code to animate cube goes here.
-  if (scene.rotatep) {
-    scene.angle+=30.0/1000.0*(time-lasttime);
-  }
+  // if (scene.rotatep) {
+  //   scene.angle+=30.0/1000.0*(time-lasttime);
+  // }
 
-  scene.doorAngle+=scene.doorAngleIncr/1000.0*(time-lasttime);
-  if (scene.doorAngle > 60.0) {
-    scene.doorAngleIncr*=-1.0;
-  }
-  if (scene.doorAngle < 0.0){
-    scene.doorAngle = 0.0;
-    scene.doorAngleIncr*=-1.0;
-  }
+  // scene.doorAngle+=scene.doorAngleIncr/1000.0*(time-lasttime);
+  // if (scene.doorAngle > 60.0) {
+  //   scene.doorAngle = 60;
+  //   scene.doorAngleIncr*=-1.0;
+  // }
+  // if (scene.doorAngle < 0.0){
+  //   scene.doorAngle = 0.0;
+  //   scene.doorAngleIncr*=-1.0;
+  // }
   //scene.mycube->set_doorAngle(scene.doorAngle);
 
   // Do the animation code here in idle, not in display.
   //  Code for moving 2nd cube
-  scene.trans += scene.transinc/1000.0*(time-lasttime);
-  if (scene.trans > 1.5) {
-    scene.trans = 1.5;
-    scene.transinc*=-1;
-  }
-  if (scene.trans < -1.5) {
-    scene.trans = -1.5;
-    scene.transinc*=-1;
-  }
+  // scene.trans += scene.transinc/1000.0*(time-lasttime);
+  // if (scene.trans > 1.5) {
+  //   scene.trans = 1.5;
+  //   scene.transinc*=-1;
+  // }
+  // if (scene.trans < -1.5) {
+  //   scene.trans = -1.5;
+  //   scene.transinc*=-1;
+  // }
   lasttime=time;
 
   glutPostRedisplay();
 }
 extern "C" void special(int key, int x, int y){
   switch(key) {
-  case GLUT_KEY_UP:
-    scene.mvz+=scene.incr;
-    break;
-  case GLUT_KEY_DOWN:
-    scene.mvz-=scene.incr;
-    break;
-  case GLUT_KEY_LEFT:
-    scene.mvx+=scene.incr;
-    break;
-  case GLUT_KEY_RIGHT:
-    scene.mvx-=scene.incr;
-    break;
+  case GLUT_KEY_UP:    scene.camera.moveforward(stepsize); break;
+  case GLUT_KEY_DOWN:  scene.camera.moveback(stepsize);    break;
+  case GLUT_KEY_LEFT:  scene.camera.moveleft(stepsize);    break;
+  case GLUT_KEY_RIGHT: scene.camera.moveright(stepsize);   break;
   }
 }
 
@@ -78,24 +71,14 @@ extern "C" void keyboard(unsigned char key, int x, int y){
     scene.incr/=2.0;
     break;
 
-  case 'x': scene.left *= 1.1; scene.right *= 1.1; break;
-  case 'X': scene.left /= 1.1; scene.right /= 1.1; break;
-    //  case 'y': bottom *= 1.1; top *= 1.1; break;
-    //  case 'Y': bottom /= 1.1; top /= 1.1; break;
   case 'z': scene.zNear  *= 1.1; scene.zFar /= 1.1; break;
   case 'Z': scene.zNear /= 1.1; scene.zFar *= 1.1; break;
-  case 'Y':
-    scene.mvy+=scene.incr;
-    break;
-  case 'y':
-    scene.mvy-=scene.incr;
-    break;
+  
+  case 'Y': scene.camera.moveup(stepsize); break;
+  case 'y': scene.camera.movedown(stepsize); break;
 
-  case 'r': scene.radius *= 1.5; break;
-  case 'R': scene.radius /= 1.5; break;
-
-  case 'T': scene.cameraangle += scene.dr; break;
-  case 't': scene.cameraangle -= scene.dr; break;
+  case 'a': scene.camera.turnleft(camrotationamount); break;
+  case 'd': scene.camera.turnright(camrotationamount); break;
 
   case 'v': 
     scene.fovy-=5; 
@@ -115,13 +98,6 @@ extern "C" void keyboard(unsigned char key, int x, int y){
     scene.rotatep=!scene.rotatep;
 
     scene.incr=0.1;
-    scene.left = -1.0;
-    scene.right = 1.0;
-    scene.bottom = -1.0;
-    scene.top = 1.0;
-    scene.mvx = 0.0;
-    scene.mvy = 0.0;
-    scene.mvz = 0.0;
 
     break;
   }
@@ -134,32 +110,16 @@ extern "C" void reshape(int width, int height){
   scene.aspect = GLfloat(width)/height;
 }
 
-extern "C" void idle(){
-  // Code to animate cube goes here.
-  if (scene.rotatep) {
-    scene.angle+=1;
-  }
-  glutPostRedisplay();
-}
-
 extern "C" void display(){
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-  point4  eye(0,0,15,1.0);
-
-  point4  at(0,0,3, 1.0);
-
-  vec4    up(0.0, 1.0, 0.0, 0.0);
-  mat4  cv = LookAt(eye, at, up);
+  mat4 cv = scene.camera.generate_view_matrix();
   
-  cv = cv * Translate(scene.mvx,scene.mvy,scene.mvz);
-  
-  glUniformMatrix4fv(scene.camera_view, 1, GL_TRUE, cv);
+  glUniformMatrix4fv(scene.camera_view_loc, 1, GL_TRUE, cv);
 
   mat4  p = Perspective(scene.fovy, scene.aspect, scene.zNear, scene.zFar) ;
 
-  glUniformMatrix4fv(scene.projection, 1, GL_TRUE, p);
+  glUniformMatrix4fv(scene.projection_loc, 1, GL_TRUE, p);
 
   glUniform1i(scene.shade_loc, false);
 
@@ -191,8 +151,6 @@ int main(int argc, char **argv){
 
   scene.init();
   
-  std::cout.flush();
-
   glutDisplayFunc(display);
   glutKeyboardFunc(keyboard);
   glutSpecialFunc(special);

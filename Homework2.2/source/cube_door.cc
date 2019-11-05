@@ -6,11 +6,11 @@
 void cube_door::draw()
 {
   glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
-  glDrawArrays(GL_TRIANGLES, Initial_Point+6, NumVertices-6);
+  glDrawArrays(GL_TRIANGLES, StartInVao+6, NumVertices-6);
   
   mat4 mv1 = mv*Translate(0.5, 0.0, 0.5)*RotateY(doorAngle)*Translate(-0.5, 0.0, -0.5);
   glUniformMatrix4fv(model_view, 1, GL_TRUE, mv1);
-  glDrawArrays(GL_TRIANGLES, Initial_Point, 6);
+  glDrawArrays(GL_TRIANGLES, StartInVao, 6);
 
 }
 

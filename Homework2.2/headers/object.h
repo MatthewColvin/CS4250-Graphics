@@ -15,11 +15,12 @@ class object{
         object(vector<point4>& GlobalPoints,vector<color4>& GlobalColors);
         object(vector<point4>& GlobalPoints,vector<color4>& GlobalColors,vector<color4>& GlobalNormals);
         void draw(); // Assumes you are drawing triangle soup 
-
+        void set_mv(mat4 nmv){mv = nmv;}
+    
     private:
       
     protected:
-        int Initial_Point; // in vao
+        int StartInVao; // in vao
         mat4 mv;
         GLint model_view;
         int NumVertices;

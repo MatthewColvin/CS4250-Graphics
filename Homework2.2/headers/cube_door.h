@@ -23,10 +23,7 @@ public:
     mv=nmv;
   };
 private:
-  mat4 mv;
   GLfloat doorAngle;
-
-  
 
 };
 #endif

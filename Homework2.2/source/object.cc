@@ -14,7 +14,7 @@ object::object(vector<point4>& GlobalPoints,vector<color4>& GlobalColors,vector<
 
 void object::draw(){
   glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
-  glDrawArrays(GL_TRIANGLES, Initial_Point, NumVertices);
+  glDrawArrays(GL_TRIANGLES, StartInVao, NumVertices);
 }
 
 void object::triangle(point4& a, point4& b, point4& c, vec4 color){

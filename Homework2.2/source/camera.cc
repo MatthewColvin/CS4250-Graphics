@@ -1,32 +1,30 @@
 #include "camera.h"
 
-Camera::Camera(){
-
-}
-
-void Camera::moveup(float amount){
-    translation *= Translate(0.0,0.0,amount);
-}
-void Camera::movedown(float amount){
-    translation*= Translate(-amount,0.0,0.0);
-}
 void Camera::moveleft(float amount){
-    translation*= Translate(-amount,0.0,0.0);
+    eye += -amount * strafedirection;
 }
 void Camera::moveright(float amount){
-    translation*= Translate(amount,0.0,0.0);
+    eye += amount * strafedirection;
 }
-
 void Camera::moveforward(float amount){
-    translation *= Translate(0.0,0.0,amount);
+    eye += amount * at;
 }
 void Camera::moveback(float amount){
-    translation *= Translate(0.0,0.0,-amount);
+   eye += -amount * at;
 }
 
-void Camera::turnleft(float degrees){
-    rotation *= RotateY(-degrees);
+void Camera::turnleft(float degrees){  
+    at = Rotate(upvec,degrees) * at;
 }
 void Camera::turnright(float degrees){
-    rotation *= RotateY(degrees);
+    at = Rotate(upvec,-degrees) * at;
+}
+
+
+
+void Camera::moveup(float amount){
+    eye += amount * upvec;
+}
+void Camera::movedown(float amount){
+    eye += amount * upvec;
 }

@@ -13,30 +13,18 @@
 class Scene{
 	public:
 		void init();
-
-		//// temp public 
-
-
+		mat4 GeneratePrespectiveMatrix();
+		
 		GLfloat incr=0.1;
 		// For perspective camera
 		GLfloat fovy=45;
 		GLfloat aspect=1.0;
-
-		GLfloat radius=15.0;
 		GLfloat angle = 0.0;
-		GLfloat cameraangle = 0.0;
-
-
-		GLfloat left = -1.0, right = 1.0;
-		GLfloat bottom = -1.0, top = 1.0;
 
 		// Camera and view parameters
 		GLfloat zNear = 0.1;
 		GLfloat zFar = 300.0;
-
-		GLfloat mvx=0.0;
-		GLfloat mvy=0.0;
-		GLfloat mvz=0.0;
+	
 
 		bool rotatep=false;          // whether to rotate or not
 
@@ -44,9 +32,9 @@ class Scene{
 
 		
 
-		GLint  camera_view;// camera-view matrix uniform shader variable location
-		GLint  model_view; // model-view matrix uniform shader variable locatio
-		GLint  projection; // projection matrix uniform shader variable location
+		GLint  camera_view_loc;// camera-view matrix uniform shader variable location
+		GLint  model_view_loc; // model-view matrix uniform shader variable locatio
+		GLint  projection_loc; // projection matrix uniform shader variable location
 		GLint  shade_loc;  // shade uniform shader variable location
 
 
@@ -63,13 +51,14 @@ class Scene{
 		cube_door* mycube;
 		sphere* mysphere;
 
-		Camera camera(){return scenecamera;}
+		Camera camera;
+		
 	private:
 		vector<point4> AllVertices;
 		vector<color4> AllColors;
 		vector<norm4> AllNormals;
 
-		Camera scenecamera;
+		
 
 
 };

@@ -1,18 +1,4 @@
 #include "cube.h"
-
-// 8 points of the cube
-point4 vertices[8] = {
-    point4(-0.5, -0.5,  0.5, 1.0),
-    point4(-0.5,  0.5,  0.5, 1.0),
-    point4( 0.5,  0.5,  0.5, 1.0),
-    point4( 0.5, -0.5,  0.5, 1.0),
-    point4(-0.5, -0.5, -0.5, 1.0),
-    point4(-0.5,  0.5, -0.5, 1.0),
-    point4( 0.5,  0.5, -0.5, 1.0),
-    point4( 0.5, -0.5, -0.5, 1.0)
-};
-
-//----------------------------------------------------------------------------
 // MyQuad generates two triangles for each face and assigns colors
 // to the vertices
 void cube::MyQuad(int a, int b, int c, int d, vec4& color){
@@ -35,11 +21,6 @@ void cube::makecolorcube(vector<vec4> colors1){
   MyQuad(5, 4, 0, 1, colors1[5]);
 }
 
-void cube::draw(){
-  glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);
-  glDrawArrays(GL_TRIANGLES, Initial_Point, NumVertices);
-}
-
 cube::cube(vector<point4>& globalpoints,vector<color4>& globalcolors,vector<color4>& wallcolors,
     GLint shader_mv_loc,
     int startinvao
@@ -50,7 +31,7 @@ cube::cube(vector<point4>& globalpoints,vector<color4>& globalcolors,vector<colo
   NumVertices=36;
 
   model_view=shader_mv_loc;
-  Initial_Point=startinvao;
+  StartInVao=startinvao;
 
   globalpoints.insert(globalpoints.end(),
     points.begin(),points.end()
