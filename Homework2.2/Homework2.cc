@@ -55,7 +55,6 @@ extern "C" void special(int key, int x, int y){
   case GLUT_KEY_RIGHT: scene.camera.moveright(stepsize);   break;
   }
 }
-
 extern "C" void keyboard(unsigned char key, int x, int y){
   switch(key) {
   case 033: // Escape Key
@@ -64,20 +63,19 @@ extern "C" void keyboard(unsigned char key, int x, int y){
     break;
 
     // Speed up/slow down movements
-  case '+':
-    scene.incr*=2.0;
-    break;
-  case '-':
-    scene.incr/=2.0;
-    break;
+  
+  case '+': scene.incr*=2.0; break;
+  case '-': scene.incr/=2.0; break;
 
   case 'z': scene.zNear  *= 1.1; scene.zFar /= 1.1; break;
-  case 'Z': scene.zNear /= 1.1; scene.zFar *= 1.1; break;
+  case 'Z': scene.zNear /= 1.1; scene.zFar *= 1.1;  break;
   
-  case 'Y': scene.camera.moveup(stepsize); break;
+  case 'Y': scene.camera.moveup(stepsize);   break;
   case 'y': scene.camera.movedown(stepsize); break;
-
-  case 'a': scene.camera.turnleft(camrotationamount); break;
+  
+  case 'w': scene.camera.turnup(camrotationamount);    break;
+  case 's': scene.camera.turndown(camrotationamount);  break;
+  case 'a': scene.camera.turnleft(camrotationamount);  break;
   case 'd': scene.camera.turnright(camrotationamount); break;
 
   case 'v': 
@@ -109,7 +107,6 @@ extern "C" void reshape(int width, int height){
 
   scene.aspect = GLfloat(width)/height;
 }
-
 extern "C" void display(){
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -127,7 +124,7 @@ extern "C" void display(){
   scene.mycube->set_mv(mv);
   scene.mycube->draw();
 
-  mv = Translate(0, 4.2,0)*RotateX(scene.angle)*Scale(1, 2, 3);
+  mv = Translate(0, 4.2,0)*RotateX(scene.angle)*Scale(2, 4, 6);
   scene.mycube2->set_mv(mv);
   scene.mycube2->draw();
 
