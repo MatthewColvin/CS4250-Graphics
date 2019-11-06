@@ -77,7 +77,6 @@ extern "C" void keyboard(unsigned char key, int x, int y){
   
   case 'Y': scene.camera.moveup(stepsize);   break;
   case 'y': scene.camera.movedown(stepsize); break;
-<<<<<<< HEAD
 
   case 'a': scene.camera.moveright(stepsize); break;
   case 'd': scene.camera.moveleft(stepsize);  break;
@@ -85,13 +84,6 @@ extern "C" void keyboard(unsigned char key, int x, int y){
   case 'w': scene.camera.moveforward(stepsize); break;
   case 's': scene.camera.moveback(stepsize);    break;
 
-=======
-  
-  case 'w': scene.camera.turnup(camrotationamount);    break;
-  case 's': scene.camera.turndown(camrotationamount);  break;
-  case 'a': scene.camera.turnleft(camrotationamount);  break;
-  case 'd': scene.camera.turnright(camrotationamount); break;
->>>>>>> 187150c3f668d61b5d86ef83239894461004c8b4
 
   case 'v': 
     scene.fovy-=5; 
