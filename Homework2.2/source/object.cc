@@ -1,16 +1,9 @@
 #include "object.h" 
 using std::vector;
 
-object::object(vector<point4>& GlobalPoints){
-
-}
-
-object::object(vector<point4>& GlobalPoints,vector<color4>& GlobalColors){
-
-}
-object::object(vector<point4>& GlobalPoints,vector<color4>& GlobalColors,vector<color4>& GlobalNormals){
-
-}
+object::object(vector<point4>& GlobalPoints){}
+object::object(vector<point4>& GlobalPoints,vector<color4>& GlobalColors){}
+object::object(vector<point4>& GlobalPoints,vector<color4>& GlobalColors,vector<color4>& GlobalNormals){}
 
 void object::draw(){
   glUniformMatrix4fv(model_view, 1, GL_TRUE, mv);

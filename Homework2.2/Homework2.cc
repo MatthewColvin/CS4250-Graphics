@@ -1,15 +1,20 @@
 #include "scene.h"
+#include <string>
+using std::string;
 
 Scene scene;
 float stepsize = 0.1; 
 float camrotationamount = 0.1;
+// usedd for mouse look around
+int oldx,oldy,deltax,deltay;
+
 
 extern "C" void display();
 extern "C" void cube2idle();
 extern "C" void special(int key, int x, int y);
 extern "C" void keyboard(unsigned char key, int x, int y);
 extern "C" void reshape(int width, int height);
-
+extern "C" void lookaround(int x, int y);
 // Simple animation
 GLint lasttime=0;
 extern "C" void cube2idle(){
@@ -55,7 +60,6 @@ extern "C" void special(int key, int x, int y){
   case GLUT_KEY_RIGHT: scene.camera.moveright(stepsize);   break;
   }
 }
-
 extern "C" void keyboard(unsigned char key, int x, int y){
   switch(key) {
   case 033: // Escape Key
@@ -77,8 +81,12 @@ extern "C" void keyboard(unsigned char key, int x, int y){
   case 'Y': scene.camera.moveup(stepsize); break;
   case 'y': scene.camera.movedown(stepsize); break;
 
-  case 'a': scene.camera.turnleft(camrotationamount); break;
-  case 'd': scene.camera.turnright(camrotationamount); break;
+  case 'a': scene.camera.moveright(stepsize); break;
+  case 'd': scene.camera.moveleft(stepsize);  break;
+
+  case 'w': scene.camera.moveforward(stepsize); break;
+  case 's': scene.camera.moveback(stepsize);    break;
+
 
   case 'v': 
     scene.fovy-=5; 
@@ -109,7 +117,6 @@ extern "C" void reshape(int width, int height){
 
   scene.aspect = GLfloat(width)/height;
 }
-
 extern "C" void display(){
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -122,6 +129,13 @@ extern "C" void display(){
   glUniformMatrix4fv(scene.projection_loc, 1, GL_TRUE, p);
 
   glUniform1i(scene.shade_loc, false);
+
+  string cameraangle = "CA:" + std::to_string(scene.camera.get_cameraangel());
+  string deltaax = "DelX:" + std::to_string(deltax);
+  string newtitle = cameraangle + deltaax ;
+
+
+   glutSetWindowTitle(newtitle.c_str());
 
   mat4 mv = RotateZ(scene.angle);
   scene.mycube->set_mv(mv);
@@ -140,6 +154,20 @@ extern "C" void display(){
   glutSwapBuffers();
 }
 
+float lookaroundsensetivity=0.008;
+extern "C" void lookaround(int x, int y){
+  deltax = oldx - x;
+  deltay = oldy -y;
+  
+  if(deltax <= 0){
+    scene.camera.turnleft(-deltax*lookaroundsensetivity);
+  }else{
+    scene.camera.turnright(deltax*lookaroundsensetivity);
+  }
+
+  oldx = x;
+  oldy = y;
+}
 
 int main(int argc, char **argv){
   glutInit(&argc, argv);
@@ -156,6 +184,7 @@ int main(int argc, char **argv){
   glutSpecialFunc(special);
   glutIdleFunc(cube2idle);
   glutReshapeFunc(reshape);
+  glutPassiveMotionFunc(lookaround);
 
   glutMainLoop();
   return(EXIT_SUCCESS);
