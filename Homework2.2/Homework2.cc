@@ -68,18 +68,16 @@ extern "C" void keyboard(unsigned char key, int x, int y){
     break;
 
     // Speed up/slow down movements
-  case '+':
-    scene.incr*=2.0;
-    break;
-  case '-':
-    scene.incr/=2.0;
-    break;
+  
+  case '+': scene.incr*=2.0; break;
+  case '-': scene.incr/=2.0; break;
 
   case 'z': scene.zNear  *= 1.1; scene.zFar /= 1.1; break;
-  case 'Z': scene.zNear /= 1.1; scene.zFar *= 1.1; break;
+  case 'Z': scene.zNear /= 1.1; scene.zFar *= 1.1;  break;
   
-  case 'Y': scene.camera.moveup(stepsize); break;
+  case 'Y': scene.camera.moveup(stepsize);   break;
   case 'y': scene.camera.movedown(stepsize); break;
+<<<<<<< HEAD
 
   case 'a': scene.camera.moveright(stepsize); break;
   case 'd': scene.camera.moveleft(stepsize);  break;
@@ -87,6 +85,13 @@ extern "C" void keyboard(unsigned char key, int x, int y){
   case 'w': scene.camera.moveforward(stepsize); break;
   case 's': scene.camera.moveback(stepsize);    break;
 
+=======
+  
+  case 'w': scene.camera.turnup(camrotationamount);    break;
+  case 's': scene.camera.turndown(camrotationamount);  break;
+  case 'a': scene.camera.turnleft(camrotationamount);  break;
+  case 'd': scene.camera.turnright(camrotationamount); break;
+>>>>>>> 187150c3f668d61b5d86ef83239894461004c8b4
 
   case 'v': 
     scene.fovy-=5; 
@@ -141,7 +146,7 @@ extern "C" void display(){
   scene.mycube->set_mv(mv);
   scene.mycube->draw();
 
-  mv = Translate(0, 4.2,0)*RotateX(scene.angle)*Scale(1, 2, 3);
+  mv = Translate(0, 4.2,0)*RotateX(scene.angle)*Scale(2, 4, 6);
   scene.mycube2->set_mv(mv);
   scene.mycube2->draw();
 
